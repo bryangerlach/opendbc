@@ -378,11 +378,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
         ("SCC_CONTROL", 50),
       ]
 
-    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      cam_messages += [
-        ("ALERTS_364", 50),
-      ]
-
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, CanBus(CP).ECAN),
       Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], cam_messages, CanBus(CP).CAM),
@@ -459,6 +454,11 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
       if CP.flags & HyundaiFlags.USE_FCA.value:
         cam_messages.append(("FCA11", 50))
+
+    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      cam_messages += [
+        ("ALERTS_364", 50),
+      ]
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0),
