@@ -102,7 +102,7 @@ def create_lkas11(packer, frame, CP, apply_torque, steer_req,
 def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
                                    torque_fault, lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
-                                   left_lane_depart, right_lane_depart, lkas_icon, msg_364):
+                                   left_lane_depart, right_lane_depart, lkas_icon):
   can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
   bus = CanBus(CP).ECAN if can_canfd_blended else 0
 
@@ -150,18 +150,23 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
 
   values["CF_Lkas_Chksum"] = checksum
 
-  dat_364 = packer.make_can_msg("ALERTS_364", bus, values)[1]
+  return packer.make_can_msg("LKAS11", bus, values)
+
+def create_msg_364(packer, frame, CP, msg_364):
+  can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
+  bus = CanBus(CP).ECAN if can_canfd_blended else 0
+
+  #Consider Taking a Break
+  dat_364 = packer.make_can_msg("ALERTS_364", bus, msg_364)[1]
   dat_364 = dat_364[1:8] if can_canfd_blended else dat_364[:6] + dat_364[7:8]
   checksum_364 = hyundai_checksum(dat_364)
 
-  #Consider Taking a Break
   if msg_364["ALERT_1"] == 5:
     msg_364["ALERT_1"] = 0
   msg_364["CHECKSUM"] = checksum_364
   msg_364["COUNTER"] = frame % (0xF if can_canfd_blended else 0x10)
 
-  #return packer.make_can_msg("LKAS11", bus, values)
-  return [packer.make_can_msg(msg, bus, data) for msg, data in [("LKAS11", values), ("ALERTS_364", msg_364)]]
+  return packer.make_can_msg("ALERTS_364", bus, msg_364)
 
 
 def create_clu11(packer, frame, clu11, button, CP, CAN):
