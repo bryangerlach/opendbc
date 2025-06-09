@@ -157,14 +157,9 @@ def create_alerts_364(packer, frame, CP, msg_364):
   can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
   bus = CanBus(CP).ECAN if can_canfd_blended else 0
   #Consider Taking a Break
-  #dat_364 = packer.make_can_msg("ALERTS_364", bus, msg_364)[1]
-  #dat_364 = dat_364[1:8] if can_canfd_blended else dat_364[:6] + dat_364[7:8]
-  #checksum_364 = hyundai_checksum(dat_364)
 
   if msg_364["ALERT_1"] == 5:
     msg_364["ALERT_1"] = 0
-  #msg_364["CHECKSUM"] = checksum_364
-  #msg_364["COUNTER"] = frame % (0xF if can_canfd_blended else 0x10)
 
   return packer.make_can_msg("ALERTS_364", bus, msg_364)
 
