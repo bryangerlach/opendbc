@@ -141,7 +141,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
                                                                   torque_fault, CS.lkas11, sys_warning, sys_state, CC.enabled,
                                                                   hud_control.leftLaneVisible, hud_control.rightLaneVisible,
                                                                   left_lane_warning, right_lane_warning,
-                                                                  self.lkas_icon, CS.msg_364))
+                                                                  self.lkas_icon))
       can_sends.append(hyundaican.create_msg_364(self.packer, self.frame, self.CP, CS.msg_364))
     else:
       can_sends.append(hyundaican.create_lkas11(self.packer, self.frame, self.CP, apply_torque, apply_steer_req,
