@@ -150,9 +150,15 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
 
   values["CF_Lkas_Chksum"] = checksum
 
+  dat_364 = packer.make_can_msg("ALERTS_364", bus, values)[1]
+  dat_364 = dat_364[1:8] if can_canfd_blended else dat_364[:6] + dat_364[7:8]
+  checksum_364 = hyundai_checksum(dat_364)
+
   #Consider Taking a Break
   if msg_364["ALERT_1"] == 5:
     msg_364["ALERT_1"] = 0
+  msg_364["CHECKSUM"] = checksum_364
+  msg_364["COUNTER"] = frame % (0xF if can_canfd_blended else 0x10)
 
   #return packer.make_can_msg("LKAS11", bus, values)
   return [packer.make_can_msg(msg, bus, data) for msg, data in [("LKAS11", values), ("ALERTS_364", msg_364)]]
