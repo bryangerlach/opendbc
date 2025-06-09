@@ -380,7 +380,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       cam_messages += [
-        ("ALERTS_1", 50),
+        ("ALERTS_364", 50),
       ]
 
     return {
