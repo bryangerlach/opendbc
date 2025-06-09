@@ -102,7 +102,7 @@ def create_lkas11(packer, frame, CP, apply_torque, steer_req,
 def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
                                    torque_fault, lkas11, sys_warning, sys_state, enabled,
                                    left_lane, right_lane,
-                                   left_lane_depart, right_lane_depart, lkas_icon):
+                                   left_lane_depart, right_lane_depart, lkas_icon, msg_364):
   can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
   bus = CanBus(CP).ECAN if can_canfd_blended else 0
 
@@ -150,7 +150,12 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
 
   values["CF_Lkas_Chksum"] = checksum
 
-  return packer.make_can_msg("LKAS11", bus, values)
+  #Consider Taking a Break
+  if msg_364["ALERT_1"] == 5:
+    msg_364["ALERT_1"] = 0
+
+  #return packer.make_can_msg("LKAS11", bus, values)
+  return [packer.make_can_msg(msg, bus, data) for msg, data in [("LKAS11", values), ("ALERTS_364", msg_364)]]
 
 
 def create_clu11(packer, frame, clu11, button, CP, CAN):
