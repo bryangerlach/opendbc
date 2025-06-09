@@ -166,7 +166,7 @@ def create_alerts_364(packer, frame, CP, msg_364):
   msg_364["CHECKSUM"] = checksum_364
   msg_364["COUNTER"] = frame % (0xF if can_canfd_blended else 0x10)
 
-  return packer.make_can_msg("ALERTS_364", msg_364)
+  return packer.make_can_msg("ALERTS_364", bus, msg_364)
 
 
 def create_clu11(packer, frame, clu11, button, CP, CAN):
