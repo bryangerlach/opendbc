@@ -162,10 +162,7 @@ def create_alerts_364(packer, CP, frame, msg_364):
     msg_364["ALERT_1"] = 0
 
   if can_canfd_blended:
-    msg_364["COUNTER"] = frame % 0xF + 1
-    if msg_364["COUNTER"] == 15:
-      msg_364["COUNTER"] = 0
-
+    #msg_364["COUNTER"] = frame % 0xF
     dat = packer.make_can_msg("ALERTS_364", bus, msg_364)[1]
     checksum = hyundai_checksum(dat[1:8])
     msg_364["CHECKSUM"] = checksum
