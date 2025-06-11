@@ -137,11 +137,11 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
                                                                                       hud_control)
 
     if can_canfd_blended:
-      can_sends.append(hyundaican.create_lkas11_can_canfd_blended(self.packer, self.frame, self.CP, apply_torque, apply_steer_req,
+      can_sends.extend(hyundaican.create_lkas11_can_canfd_blended(self.packer, self.frame, self.CP, apply_torque, apply_steer_req,
                                                                   torque_fault, CS.lkas11, sys_warning, sys_state, CC.enabled,
                                                                   hud_control.leftLaneVisible, hud_control.rightLaneVisible,
                                                                   left_lane_warning, right_lane_warning,
-                                                                  self.lkas_icon))
+                                                                  self.lkas_icon, CS.msg_364))
     else:
       can_sends.append(hyundaican.create_lkas11(self.packer, self.frame, self.CP, apply_torque, apply_steer_req,
                                                 torque_fault, CS.lkas11, sys_warning, sys_state, CC.enabled,
@@ -171,8 +171,8 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
                                                       CS.main_cruise_enabled, self.tuning, self.ESCC))
 
     # 50 Hz DAW message
-    if self.frame % 2 == 0 and self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      can_sends.append(hyundaican.create_alerts_364(self.packer, self.CP, self.frame, CS.msg_364))
+    #if self.frame % 2 == 0 and self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+    #  can_sends.append(hyundaican.create_alerts_364(self.packer, self.CP, self.frame, CS.msg_364))
 
     # 20 Hz LFA MFA message
     if self.frame % 5 == 0 and self.CP.flags & HyundaiFlags.SEND_LFA.value:
