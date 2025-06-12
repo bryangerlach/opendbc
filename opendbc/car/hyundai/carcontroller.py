@@ -170,9 +170,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
                                                       CC.cruiseControl.override, use_fca, self.CP,
                                                       CS.main_cruise_enabled, self.tuning, self.ESCC))
 
-    # 50 Hz DAW message
-    #if self.frame % 2 == 0 and self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-    #  can_sends.append(hyundaican.create_alerts_364(self.packer, self.CP, self.frame, CS.msg_364))
 
     # 20 Hz LFA MFA message
     if self.frame % 5 == 0 and self.CP.flags & HyundaiFlags.SEND_LFA.value:
