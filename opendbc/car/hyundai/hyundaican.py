@@ -244,7 +244,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
   for addr, values in msg_values:
     values["COUNTER"] = idx % 0xF
-    checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+    dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
+    checksum = hyundai_checksum(dat[1:8])
     values["CHECKSUM"] = checksum
     ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
 
