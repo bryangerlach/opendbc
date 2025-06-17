@@ -207,6 +207,50 @@ def create_lfahda_mfc(packer, frame, CP, enabled, lfa_icon):
 
   return packer.make_can_msg("LFAHDA_MFC", bus, values)
 
+def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
+                        main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
+  ret = []
+
+  msg_values = [
+    ("SCC11", {
+      "aReqRaw": tuning.desired_accel,
+      "aReqValue": tuning.actual_accel,
+      "JerkUpperLimit": tuning.jerk_upper,
+      "JerkLowerLimit": tuning.jerk_lower,
+    }),
+
+    ("SCC12", {
+      "MainMode_ACC": 1,
+      "ACCMode_Inactive": 0 if enabled else 1,
+      "TauGapSet": hud_control.leadDistanceBars,
+      "VSetDis": set_speed,
+      "ACC_ObjDist": 1,
+      "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
+      "StopReq": 1 if stopping else 0,
+    }),
+
+    ("SCC14", {
+      "ACC_ObjLatPos": 0,
+      "ObjValid": 0,
+      "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
+    }),
+
+    ("FCA11", {
+      "BYTE4": 0xC0,
+      "BYTE5": 0x3F,
+      "BYTE6": 0x7F,
+    }),
+  ]
+
+  for addr, values in msg_values:
+    values["COUNTER"] = idx % 0xF
+    checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+    values["CHECKSUM"] = checksum
+    ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
+
+  return ret
+
+
 def create_acc_commands(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
                         main_cruise_enabled, tuning, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
@@ -338,3 +382,10 @@ def create_frt_radar_opt(packer):
     "CF_FCA_Equip_Front_Radar": 1,
   }
   return packer.make_can_msg("FRT_RADAR11", 0, frt_radar11_values)
+
+def create_checksum_can_canfd_blended(packer, CAN, addr, values):
+  dat = packer.make_can_msg(addr, CAN.ECAN, values)[2]
+  dat = dat[1:8]
+  checksum = hyundai_checksum(dat)
+
+  return checksum

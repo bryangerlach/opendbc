@@ -33,11 +33,18 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
-  {0x420, 0,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
-  {0x421, 0,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
-  {0x50A, 0,       8, .check_relay = true},   /* SCC13 Bus 0       */ \
-  {0x389, 0,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
-  {0x4A2, 0,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
+  {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
+  {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
+  /*{0x50A, 0,       8, .check_relay = true},   /* SCC13 Bus 0       */ \
+  {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
+  {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
+  {0x50, 0, 16, .check_relay = false}, \
+  {0x4F1, 0, 4, .check_relay = false}, \
+  {0x2A4, 1, 24, .check_relay = false}, \
+  {0x340, 2, 8, .check_relay = false}, \
+  {0x485, 2, 8, .check_relay = false}, \
+  {0x38D, 0, 8, .check_relay = false}, \
+  {0x363, 2, 8, .check_relay = false}, \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
   {.msg = {{0x260, 0, 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
@@ -315,8 +322,9 @@ static safety_config hyundai_init(uint16_t param) {
   hyundai_legacy = false;
 
   if (hyundai_can_canfd_blended) {
-    hyundai_longitudinal = false;
+    gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
   }
+
 
   safety_config ret;
   if (hyundai_longitudinal) {
