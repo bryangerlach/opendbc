@@ -320,9 +320,9 @@ static safety_config hyundai_init(uint16_t param) {
   hyundai_common_init(param);
   hyundai_legacy = false;
 
-  if (hyundai_can_canfd_blended) {
-    gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
-  }
+  // if (hyundai_can_canfd_blended) {
+  //   gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
+  // }
 
 
   safety_config ret;
