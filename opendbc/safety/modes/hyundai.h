@@ -37,12 +37,11 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
   {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
-  {0x50, 0, 16, .check_relay = false}, \
-  {0x4F1, 0, 4, .check_relay = false}, \
+  {0x4F1, scc_bus, 4, .check_relay = false}, \
   {0x2A4, 1, 24, .check_relay = false}, \
   {0x340, 2, 8, .check_relay = false}, \
   {0x485, 2, 8, .check_relay = false}, \
-  {0x38D, 0, 8, .check_relay = false}, \
+  {0x38D, scc_bus, 8, .check_relay = false}, \
   {0x363, 2, 8, .check_relay = false}, \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
