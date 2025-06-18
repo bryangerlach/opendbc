@@ -366,7 +366,7 @@ def create_acc_commands(packer, enabled, accel, upper_jerk, idx, hud_control, se
 
   return commands
 
-def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
+def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
   """
     Creates SCC13 and FCA12. If ESCC is enabled, it will only create SCC13 since ESCC does not block FCA12.
     :param packer:
@@ -390,7 +390,7 @@ def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
   scc13_values = get_scc13_values()
-  commands.append(packer.make_can_msg("SCC13", 0, scc13_values))
+  commands.append(packer.make_can_msg("SCC13", CAN.ECAN, scc13_values))
 
   # If ESCC is available and enabled, we skip FCA12, since ESCC does not block FCA12
   if ESCC and ESCC.enabled:

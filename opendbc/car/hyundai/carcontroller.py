@@ -184,7 +184,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # 5 Hz ACC options
     if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl:
-      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.ESCC))
+      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.CAN, self.ESCC))
 
     # 2 Hz front radar options
     if self.frame % 50 == 0 and self.CP.openpilotLongitudinalControl and not self.ESCC.enabled and not can_canfd_blended:
