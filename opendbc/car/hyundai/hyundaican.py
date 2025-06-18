@@ -231,7 +231,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }
 
   def calculate_scc12_checksum(values):
-    scc12_dat = packer.make_can_msg("SCC12", CAN.ECAN, values)[1]
+    scc12_dat = packer.make_can_msg("SCC12", 0, values)[1]
     scc12_dat = scc12_dat[1:8]
     checksum = hyundai_checksum(scc12_dat)
     values["CR_VSM_ChkSum"] = checksum
@@ -252,28 +252,28 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }
 
   def calculate_fca11_checksum(values):
-    fca11_dat = packer.make_can_msg("FCA11", CAN.ECAN, values)[1]
+    fca11_dat = packer.make_can_msg("FCA11", 0, values)[1]
     fca11_dat = fca11_dat[1:8]
     checksum = hyundai_checksum(fca11_dat)
     values["CR_FCA_ChkSum"] = checksum
     return values
 
   scc11_values = get_scc11_values()
-  commands.append(packer.make_can_msg("SCC11", CAN.ECAN, scc11_values))
+  commands.append(packer.make_can_msg("SCC11", 0, scc11_values))
 
   scc12_values = get_scc12_values()
   scc12_values = calculate_scc12_checksum(scc12_values)
-  commands.append(packer.make_can_msg("SCC12", CAN.ECAN, scc12_values))
+  commands.append(packer.make_can_msg("SCC12", 0, scc12_values))
 
   scc14_values = get_scc14_values()
-  commands.append(packer.make_can_msg("SCC14", CAN.ECAN, scc14_values))
+  commands.append(packer.make_can_msg("SCC14", 0, scc14_values))
 
   if use_fca and not ((CP.flags & HyundaiFlags.CAMERA_SCC) or (ESCC and ESCC.enabled)):
     # note that some vehicles most likely have an alternate checksum/counter definition
     # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
     fca11_values = get_fca11_values()
     fca11_values = calculate_fca11_checksum(fca11_values)
-    commands.append(packer.make_can_msg("FCA11", CAN.ECAN, fca11_values))
+    commands.append(packer.make_can_msg("FCA11", 0, fca11_values))
 
   return commands
 

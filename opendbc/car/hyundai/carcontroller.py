@@ -101,7 +101,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     if self.frame % 100 == 0 and not ((self.CP.flags & HyundaiFlags.CANFD_CAMERA_SCC) or self.ESCC.enabled) and \
             self.CP.openpilotLongitudinalControl:
       # for longitudinal control, either radar or ADAS driving ECU
-      addr, bus = 0x7d0, self.CAN.ECAN if self.CP.flags & HyundaiFlags.CANFD else 0
+      addr, bus = 0x7d0, self.CAN.ECAN if self.CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED) else 0
       if self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, self.CAN.ECAN
       can_sends.append(make_tester_present_msg(addr, bus, suppress_response=True))
@@ -183,7 +183,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       #can_sends.append(hyundaican.create_lfahda_mfc(self.packer, CC.enabled, self.lfa_icon))
 
     # 5 Hz ACC options
-    if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl:
+    if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl and not can_canfd_blended:
       can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.CAN, self.ESCC))
 
     # 2 Hz front radar options
