@@ -41,6 +41,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x2A4, 1, 24, .check_relay = false},             /* */ \
   {0x38D, scc_bus, 8, .check_relay = false},        /* fca11 bus 0*/ \
   {0x363, 2, 8, .check_relay = false},              /* radar_0x363 bus 2*/ \
+  {0x7D0, 0, 8, .check_relay = false},              /* radar disable? */ \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
   {.msg = {{0x260, 0, 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
