@@ -430,7 +430,7 @@ def create_radar_aux_messages(packer, CAN, frame):
     if frame % freq == 0:
       values["COUNTER"] = frame % 0xF
       checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
-      values["CHECKSUM"] = checksum
+      values["_CHECKSUM"] = checksum
       ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
 
   return ret
