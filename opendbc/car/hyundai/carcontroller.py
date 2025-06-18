@@ -161,6 +161,9 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
           if (self.frame - self.last_button_frame) * DT_CTRL >= 0.15:
             self.last_button_frame = self.frame
 
+    if self.CP.openpilotLongitudinalControl and can_canfd_blended:
+      can_sends.extend(hyundaican.create_radar_aux_messages(self.packer, self.CAN, self.frame))
+
     if self.frame % 2 == 0 and self.CP.openpilotLongitudinalControl:
       # TODO: unclear if this is needed
       jerk = 3.0 if actuators.longControlState == LongCtrlState.pid else 1.0

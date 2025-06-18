@@ -211,6 +211,9 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
+  can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
+  bus = CanBus(CP).ECAN if can_canfd_blended else 0
+
   def get_scc11_values():
     return {
       "aReqRaw": tuning.desired_accel,
@@ -231,7 +234,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }
 
   def calculate_scc12_checksum(values):
-    scc12_dat = packer.make_can_msg("SCC12", CAN.ECAN, values)[1]
+    scc12_dat = packer.make_can_msg("SCC12", bus, values)[1]
     scc12_dat = scc12_dat[1:8]
     checksum = hyundai_checksum(scc12_dat)
     values["CR_VSM_ChkSum"] = checksum
@@ -252,28 +255,28 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }
 
   def calculate_fca11_checksum(values):
-    fca11_dat = packer.make_can_msg("FCA11", CAN.ECAN, values)[1]
+    fca11_dat = packer.make_can_msg("FCA11", bus, values)[1]
     fca11_dat = fca11_dat[1:8]
     checksum = hyundai_checksum(fca11_dat)
     values["CR_FCA_ChkSum"] = checksum
     return values
 
   scc11_values = get_scc11_values()
-  commands.append(packer.make_can_msg("SCC11", CAN.ECAN, scc11_values))
+  commands.append(packer.make_can_msg("SCC11", bus, scc11_values))
 
   scc12_values = get_scc12_values()
   scc12_values = calculate_scc12_checksum(scc12_values)
-  commands.append(packer.make_can_msg("SCC12", CAN.ECAN, scc12_values))
+  commands.append(packer.make_can_msg("SCC12", bus, scc12_values))
 
   scc14_values = get_scc14_values()
-  commands.append(packer.make_can_msg("SCC14", CAN.ECAN, scc14_values))
+  commands.append(packer.make_can_msg("SCC14", bus, scc14_values))
 
   if use_fca and not ((CP.flags & HyundaiFlags.CAMERA_SCC) or (ESCC and ESCC.enabled)):
     # note that some vehicles most likely have an alternate checksum/counter definition
     # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
     fca11_values = get_fca11_values()
     fca11_values = calculate_fca11_checksum(fca11_values)
-    commands.append(packer.make_can_msg("FCA11", CAN.ECAN, fca11_values))
+    commands.append(packer.make_can_msg("FCA11", bus, fca11_values))
 
   return commands
 
@@ -409,6 +412,28 @@ def create_frt_radar_opt(packer):
     "CF_FCA_Equip_Front_Radar": 1,
   }
   return packer.make_can_msg("FRT_RADAR11", 0, frt_radar11_values)
+
+def create_radar_aux_messages(packer, CAN, frame):
+  ret = []
+
+  msg_values = [
+    ("RADAR_0x363", 2,  {
+      "FCA_ESA": 1,
+    }),
+    ("RADAR_0x398", 5,  {
+      "BYTE4": 0x80,
+      "BYTE5": 0x5D,
+    }),
+  ]
+
+  for addr, freq, values in msg_values:
+    if frame % freq == 0:
+      values["COUNTER"] = frame % 0xF
+      checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+      values["CHECKSUM"] = checksum
+      ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
+
+  return ret
 
 def create_checksum_can_canfd_blended(packer, CAN, addr, values):
   dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
