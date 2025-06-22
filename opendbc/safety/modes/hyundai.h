@@ -356,13 +356,13 @@ static safety_config hyundai_init(uint16_t param) {
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
   };
 
-  static const CanMsg HYUNDAI_CAMERA_SCC_TX_MSGS[] = {
-    HYUNDAI_COMMON_TX_MSGS(2)
-  };
+  // static const CanMsg HYUNDAI_CAMERA_SCC_TX_MSGS[] = {
+  //   HYUNDAI_COMMON_TX_MSGS(2)
+  // };
 
-  static const CanMsg HYUNDAI_CAMERA_SCC_LONG_TX_MSGS[] = {
-    HYUNDAI_LONG_COMMON_TX_MSGS(2)
-  };
+  // static const CanMsg HYUNDAI_CAMERA_SCC_LONG_TX_MSGS[] = {
+  //   HYUNDAI_LONG_COMMON_TX_MSGS(2)
+  // };
 
   // static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
   //   HYUNDAI_LONG_COMMON_TX_MSGS(0)
