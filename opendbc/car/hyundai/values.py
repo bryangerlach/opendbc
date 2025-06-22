@@ -53,6 +53,9 @@ class CarControllerParams:
     # Default for most HKG
     else:
       self.STEER_MAX = 384
+      self.STEER_MAX = 330 if CP.flags & HyundaiFlags.ALT_LIMITS else 384
+      self.STEER_DELTA_UP = 2 if CP.flags & HyundaiFlags.ALT_LIMITS else 3
+      self.STEER_DELTA_DOWN = 3 if CP.flags & HyundaiFlags.ALT_LIMITS else 7
 
 
 class HyundaiSafetyFlags(IntFlag):
@@ -126,6 +129,8 @@ class HyundaiFlags(IntFlag):
 
   ALT_LIMITS_2 = 2 ** 26
 
+  CAN_CANFD_BLENDED = 2 ** 27
+
 
 class Footnote(Enum):
   CANFD = CarFootnote(
@@ -153,6 +158,9 @@ class HyundaiPlatformConfig(PlatformConfig):
 
     if self.flags & HyundaiFlags.MIN_STEER_32_MPH:
       self.specs = self.specs.override(minSteerSpeed=32 * CV.MPH_TO_MS)
+
+    if self.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      self.dbc_dict = {Bus.pt: "hyundai_palisade_2023_generated"}
 
 
 @dataclass
@@ -333,6 +341,14 @@ class CAR(Platforms):
     ],
     CarSpecs(mass=1999, wheelbase=2.9, steerRatio=15.6 * 1.15, tireStiffnessFactor=0.63),
     flags=HyundaiFlags.MANDO_RADAR | HyundaiFlags.CHECKSUM_CRC8,
+  )
+  HYUNDAI_PALISADE_2023 = HyundaiPlatformConfig(
+    [
+      HyundaiCarDocs("Hyundai Palisade (with HDA II) 2023-24", "All", car_parts=CarParts.common([CarHarness.hyundai_r])),
+      HyundaiCarDocs("Kia Telluride (with HDA II) 2023-24", "All", car_parts=CarParts.common([CarHarness.hyundai_p])),
+    ],
+    HYUNDAI_PALISADE.specs,
+    flags=HyundaiFlags.CHECKSUM_CRC8 | HyundaiFlags.CAN_CANFD_BLENDED | HyundaiFlags.RADAR_SCC,
   )
   HYUNDAI_VELOSTER = HyundaiPlatformConfig(
     [HyundaiCarDocs("Hyundai Veloster 2019-20", min_enable_speed=5. * CV.MPH_TO_MS, car_parts=CarParts.common([CarHarness.hyundai_e]))],

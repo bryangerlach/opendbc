@@ -1424,6 +1424,18 @@
     ],
     "package": "All"
   },
+  "Hyundai Palisade 2023-25": {
+    "platform": "HYUNDAI_PALISADE_2023",
+    "make": "Hyundai",
+    "brand": "hyundai",
+    "model": "Palisade",
+    "year": [
+      "2023",
+      "2024",
+      "2025"
+    ],
+    "package": "All"
+  },
   "Hyundai Santa Cruz 2022-24": {
     "platform": "HYUNDAI_SANTA_CRUZ_1ST_GEN",
     "make": "Hyundai",
@@ -2046,6 +2058,18 @@
       "2020",
       "2021",
       "2022"
+    ],
+    "package": "All"
+  },
+  "Kia Telluride 2023-25": {
+    "platform": "HYUNDAI_PALISADE_2023",
+    "make": "Kia",
+    "brand": "hyundai",
+    "model": "Telluride",
+    "year": [
+      "2023",
+      "2024",
+      "2025"
     ],
     "package": "All"
   },

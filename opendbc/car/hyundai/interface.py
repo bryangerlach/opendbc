@@ -118,6 +118,19 @@ class CarInterface(CarInterfaceBase):
     ret.steerLimitTimer = 0.4
     CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
+    if candidate == CAR.HYUNDAI_PALISADE_2023:
+      for fw in car_fw:
+        if fw.ecu == "eps":
+          platform_str = "HYUNDAI_PALISADE_2023_EPS_4LXPC100" if fw.fwVersion.endswith(b'4LXPC100') else \
+            "HYUNDAI_PALISADE_2023_EPS_2427" if fw.fwVersion.endswith(b'2427') else \
+              candidate
+
+          CarInterfaceBase.configure_torque_tune(platform_str, ret.lateralTuning)
+
+          if platform_str == "HYUNDAI_PALISADE_2023_EPS_2427":
+            # We only limit in the controller, panda safety limits apply for both Palisade HDA2 and Telluride HDA2
+            ret.flags |= HyundaiFlags.ALT_LIMITS.value
+
     if ret.flags & HyundaiFlags.ALT_LIMITS:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.ALT_LIMITS.value
 
