@@ -160,7 +160,7 @@ def create_lfahda_cluster(packer, CAN, enabled, lfa_icon, can_canfd_blended):
   msg = "LFAHDA_MFC" if can_canfd_blended else "LFAHDA_CLUSTER"
   if can_canfd_blended:
     checksum = create_checksum_can_canfd_hybrid(packer, CAN, msg, values)
-    values["CHECKSUM"] = checksum
+    values["_CHECKSUM"] = checksum
 
   return packer.make_can_msg(msg, CAN.ECAN, values)
 
