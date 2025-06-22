@@ -349,12 +349,12 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
 }
 
 static safety_config hyundai_init(uint16_t param) {
-  static const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
-    HYUNDAI_LONG_COMMON_TX_MSGS(0)
-    {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
-    {0x483, 0, 8, .check_relay = false}, // FCA12 Bus 0
-    {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
-  };
+  // static const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
+  //   HYUNDAI_LONG_COMMON_TX_MSGS(0)
+  //   {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
+  //   {0x483, 0, 8, .check_relay = false}, // FCA12 Bus 0
+  //   {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
+  // };
 
   // static const CanMsg HYUNDAI_CAMERA_SCC_TX_MSGS[] = {
   //   HYUNDAI_COMMON_TX_MSGS(2)
