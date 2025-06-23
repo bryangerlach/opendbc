@@ -41,8 +41,8 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
   {.msg = {{0x260, 0, 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
            {0x371, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 100U}, { 0 }}},                                                    \
-  {.msg = {{0x386, 0, 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = 100U}, { 0 }, { 0 }}}, \
-  {.msg = {{0x394, 0, 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = 100U}, { 0 }, { 0 }}},  \
+  {.msg = {{0x386, 0, 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
+  {.msg = {{0x394, 0, 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},  \
   {.msg = {{0x251, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                              \
   {.msg = {{0x4F1, 0, 4, .ignore_checksum = true, .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                                  \
 
@@ -304,14 +304,8 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
-      {0x4F1, 0, 4, .check_relay = false},        /* clu12 bus 0*/ \
-      {0x2A4, 1, 24, .check_relay = false},             /* */ \
-      {0x363, 2, 8, .check_relay = false},              /* radar_0x363 bus 2*/ \
-      {0x340, 2, 8, .check_relay = false},
-      {0x485, 2, 8, .check_relay = false},
-      {0x420, 0, 8, .check_relay = false},
-      {0x421, 0, 8, .check_relay = false},
-      {0x389, 0, 8, .check_relay = false},
+      {0x2A4, 1, 24, .check_relay = false},
+      {0x363, 2, 8, .check_relay = false},
       {0x398, 0, 8, .check_relay = false},
   };
 
