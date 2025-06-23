@@ -30,7 +30,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x4F1, scc_bus, 4, .check_relay = false},  /* CLU11 Bus 0 (radar-SCC) or 2 (camera-SCC) */ \
   {0x485, 0,       4, .check_relay = true},   /* LFAHDA_MFC Bus 0                          */ \
 
-const CanMsg HYUNDAI_CAN_CANFD_HYBRID_HDA2_TX_MSGS[] = {
+const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = false},
   {0x4F1, 1, 4, .check_relay = false},
   {0x2A4, 0, 24, .check_relay = false},
@@ -50,7 +50,7 @@ const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
   {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
 };
 
-const CanMsg HYUNDAI_CAN_CANFD_HYBRID_HDA2_LONG_TX_MSGS[] = {
+const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = false},
   {0x4F1, 1, 4, .check_relay = false},
   {0x2A4, 0, 24, .check_relay = false},
@@ -109,12 +109,12 @@ RxCheck hyundai_rx_checks[] = {
    HYUNDAI_SCC12_ADDR_CHECK(false, 0)
 };
 
-RxCheck hyundai_can_canfd_hybrid_hda2_rx_checks[] = {
+RxCheck hyundai_can_canfd_blended_hda2_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
   HYUNDAI_SCC12_ADDR_CHECK(true, 1)
 };
 
-RxCheck hyundai_can_canfd_hybrid_hda2_long_rx_checks[] = {
+RxCheck hyundai_can_canfd_blended_hda2_long_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
   {.msg = {{0x4F1, 1, 4, .ignore_checksum = true, .max_counter = 15U, .frequency = 50U}, { 0 }, { 0 }}},
 };
@@ -377,10 +377,10 @@ static safety_config hyundai_init(uint16_t param) {
 
   safety_config ret;
   if (hyundai_longitudinal) {
-    ret = BUILD_SAFETY_CFG(hyundai_can_canfd_hybrid_hda2_long_rx_checks, HYUNDAI_CAN_CANFD_HYBRID_HDA2_LONG_TX_MSGS);
+    ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_hda2_long_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS);
   // TODO: should just be hyundai_hda2
   } else if (hyundai_can_canfd_blended) {
-    ret = BUILD_SAFETY_CFG(hyundai_can_canfd_hybrid_hda2_rx_checks, HYUNDAI_CAN_CANFD_HYBRID_HDA2_TX_MSGS);
+    ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_hda2_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS);
   } else {
     ret = BUILD_SAFETY_CFG(hyundai_rx_checks, HYUNDAI_TX_MSGS);
   }
