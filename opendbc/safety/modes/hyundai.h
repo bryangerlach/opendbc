@@ -307,22 +307,12 @@ static safety_config hyundai_init(uint16_t param) {
       {0x4F1, 0, 4, .check_relay = false},        /* clu12 bus 0*/ \
       {0x2A4, 1, 24, .check_relay = false},             /* */ \
       {0x363, 2, 8, .check_relay = false},              /* radar_0x363 bus 2*/ \
-      {0x50, 0, 16, .check_relay = false},
-      {0x51, 0, 32, .check_relay = false},
-      {0x730, 1, 8, .check_relay = false},
-      {0x340, 1, 8, .check_relay = false},
-      {0x485, 1, 8, .check_relay = false},
-      {0x420, 1, 8, .check_relay = false},
-      {0x421, 1, 8, .check_relay = false},
-      {0x389, 1, 8, .check_relay = false},
-      {0x38D, 1, 8, .check_relay = false},
-      {0x363, 1, 8, .check_relay = false},
-      {0x398, 1, 8, .check_relay = false},
-      {0x399, 1, 8, .check_relay = false},
-      {0x39a, 1, 8, .check_relay = false},
-      {0x39b, 1, 8, .check_relay = false},
-      {0x39c, 1, 8, .check_relay = false},
-      {0x43a, 1, 8, .check_relay = false},
+      {0x340, 2, 8, .check_relay = false},
+      {0x485, 2, 8, .check_relay = false},
+      {0x420, 0, 8, .check_relay = false},
+      {0x421, 0, 8, .check_relay = false},
+      {0x389, 0, 8, .check_relay = false},
+      {0x398, 0, 8, .check_relay = false},
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
