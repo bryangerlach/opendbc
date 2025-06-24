@@ -120,18 +120,22 @@ static uint32_t hyundai_compute_checksum(const CANPacket_t *to_push) {
     }
     chksum = (chksum ^ 9U) & 15U;
   } else {
-    // sum of nibbles
-    for (int i = 0; i < 8; i++) {
-      if ((addr == 0x394) && (i == 7)) {
-        continue; // exclude
+    if (hyundai_can_canfd_blended && (addr == 0x421)) {
+      chksum = hyundai_common_canfd_compute_checksum(to_push);
+    } else {
+      // sum of nibbles
+      for (int i = 0; i < 8; i++) {
+        if ((addr == 0x394) && (i == 7)) {
+          continue; // exclude
+        }
+        uint8_t b = GET_BYTE(to_push, i);
+        if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
+          b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
+        }
+        chksum += (b % 16U) + (b / 16U);
       }
-      uint8_t b = GET_BYTE(to_push, i);
-      if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
-        b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
-      }
-      chksum += (b % 16U) + (b / 16U);
+      chksum = (16U - (chksum %  16U)) % 16U;
     }
-    chksum = (16U - (chksum % 16U)) % 16U;
   }
 
   return chksum;
@@ -230,26 +234,26 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // ACCEL: safety check
-  if (addr == 0x421) {
-    int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
-    int desired_accel_val = ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
+    if (((addr == 0x420) && hyundai_can_canfd_blended) || ((addr == 0x421) && !hyundai_can_canfd_blended)) {
+      int desired_accel_raw = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 4) & 0x3FU) << 5) | (GET_BYTE(to_send, 3) >> 3)) - 1023U :
+                                                              (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
+      int desired_accel_val = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 3) & 0x7U) << 8) | GET_BYTE(to_send, 2)) - 1023U :
+                                                              ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
 
-    int aeb_decel_cmd = GET_BYTE(to_send, 2);
-    bool aeb_req = GET_BIT(to_send, 54U);
+      int aeb_decel_cmd = hyundai_can_canfd_blended ? 0 : GET_BYTE(to_send, 2);
+      bool aeb_req = hyundai_can_canfd_blended ? 0 : GET_BIT(to_send, 54U);
 
-    bool violation = false;
+      bool violation = false;
 
-    violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
-    violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
-    if (!hyundai_escc) {
+      violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
+      violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
       violation |= (aeb_decel_cmd != 0);
       violation |= aeb_req;
-    }
 
-    if (violation) {
-      tx = false;
+      if (violation) {
+        tx = false;
+      }
     }
-  }
 
   // LKA STEER: safety check
   if (addr == 0x340) {
@@ -266,7 +270,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // UDS: Only tester present ("\x02\x3E\x80\x00\x00\x00\x00\x00") allowed on diagnostics address
-  if (addr == 0x7D0) {
+  if ((addr == 0x7D0) || (addr == 0x730)) {
     if ((GET_BYTES(to_send, 0, 4) != 0x00803E02U) || (GET_BYTES(to_send, 4, 4) != 0x0U)) {
       tx = false;
     }
