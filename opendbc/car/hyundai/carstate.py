@@ -42,7 +42,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
                           "GEAR_ALT" if CP.flags & HyundaiFlags.CANFD_ALT_GEARS else \
                           "GEAR_ALT_2" if CP.flags & HyundaiFlags.CANFD_ALT_GEARS_2 else \
                           "GEAR_SHIFTER"
-    if CP.flags & HyundaiFlags.CANFD:
+    if CP.flags & HyundaiFlags.CANFD and not CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.shifter_values = can_define.dv[self.gear_msg_canfd]["GEAR"]
     elif CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV):
       self.shifter_values = can_define.dv["ELECT_GEAR"]["Elect_Gear_Shifter"]
@@ -81,7 +81,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     cp = can_parsers[Bus.pt]
     cp_cam = can_parsers[Bus.cam]
 
-    if self.CP.flags & HyundaiFlags.CANFD:
+    if self.CP.flags & HyundaiFlags.CANFD and not (self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED):
       return self.update_canfd(can_parsers)
 
     ret = structs.CarState()
