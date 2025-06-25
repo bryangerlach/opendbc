@@ -288,6 +288,7 @@ BO_ 870 EMS_366: 8 XXX
 
 BO_ 871 LVR12: 8 XXX
  SG_ CF_Lvr_CruiseSet : 0|8@1+ (1,0) [0|0] "" XXX
+ SG_ AUTO_START_STOP : 8|2@1+ (1,0) [0|3] "" XXX
  SG_ CF_Lvr_Gear : 32|4@1+ (1,0) [0|0] "" XXX
 
 BO_ 872 LVR11: 8 XXX
@@ -541,6 +542,11 @@ BO_ 1082 RADAR_0x43a: 8 XXX
  SG_ BYTE5 : 40|8@1+ (1,0) [0|0] "" XXX
  SG_ BYTE6 : 48|8@1+ (1,0) [0|0] "" XXX
  SG_ BYTE7 : 56|8@1+ (1,0) [0|0] "" XXX
+
+BO_ 1123 MSG_463: 8 XXX
+ SG_ DRV_MODE_1 : 0|8@1+ (1,0) [0|255] "" XXX
+ SG_ DRV_MODE_2 : 8|8@1+ (1,0) [0|255] "" XXX
+ SG_ DRV_MODE_3 : 16|8@1+ (1,0) [0|255] "" XXX
 
 BO_ 1136 P_STS: 8 XXX
  SG_ Checksum : 62|2@1+ (1,0) [0|0] "" XXX
@@ -868,6 +874,7 @@ BO_ 1456 CLU12: 4 XXX
 CM_ SG_ 1348 SpeedLim_Nav_Clu "Speed limit displayed on Nav, Cluster and HUD";
 
 VAL_ 871 CF_Lvr_Gear 12 "T" 5 "D" 8 "S" 6 "N" 7 "R" 0 "P";
+VAL_ 871 AUTO_START_STOP 3 "Off" 1 "On";
 VAL_ 909 CF_VSM_Warn 2 "FCW" 3 "AEB";
 VAL_ 916 ACCEnable 0 "SCC ready" 1 "SCC temp fault" 2 "SCC permanent fault" 3 "SCC permanent fault, communication issue";
 VAL_ 1057 ACCMode 0 "off" 1 "enabled" 2 "driver_override" 3 "off_maybe_fault" 4 "cancelled";

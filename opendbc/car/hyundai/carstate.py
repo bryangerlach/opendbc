@@ -65,6 +65,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
     self.cruise_info = {}
     self.msg_364 = {}
+    self.msg_463 = {}
+    self.lvr12 = {}
 
     # On some cars, CLU15->CF_Clu_VehicleSpeed can oscillate faster than the dash updates. Sample at 5 Hz
     self.cluster_speed = 0
@@ -147,6 +149,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     # Consider Taking a Break message
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.msg_364 = copy.copy(cp_cam.vl["ALERTS_364"])
+      self.msg_463 = copy.copy(cp.v1["MSG_463"])
+      self.lvr12 = copy.copy(cp.v1["LVR12"])
 
     # TODO: Find brake pressure
     ret.brake = 0
@@ -438,6 +442,11 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       pt_messages.append(("TCU12", 100))
     else:
       pt_messages.append(("LVR12", 100))
+
+    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      pt_messages += [
+        ("MSG_463", 100),
+      ]
 
     if CP.flags & HyundaiFlags.HAS_LDA_BUTTON:
       pt_messages.append(("BCM_PO_11", 50))

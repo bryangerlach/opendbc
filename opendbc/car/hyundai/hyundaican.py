@@ -338,3 +338,15 @@ def create_frt_radar_opt(packer):
     "CF_FCA_Equip_Front_Radar": 1,
   }
   return packer.make_can_msg("FRT_RADAR11", 0, frt_radar11_values)
+
+def set_drive_mode(packer, CP, msg_463):
+  msg_463["DRV_MODE_1"] = 49
+  msg_463["DRV_MODE_2"] = 1
+  msg_463["DRV_MODE_3"] = 0
+
+  return packer.make_can_msg("MSG_463", CanBus(CP).ACAN, msg_463)
+
+def set_auto_start_stop(packer, CP, lvr12):
+  lvr12["AUTO_START_STOP"] = 0 # 3 = disabled, 0 = enabled
+
+  return packer.make_can_msg("LVR12", CanBus(CP).ECAN, lvr12)
