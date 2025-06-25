@@ -60,7 +60,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     self.apply_torque_last = 0
     self.car_fingerprint = CP.carFingerprint
     self.last_button_frame = 0
-    self.run_once = True
 
   def update(self, CC, CC_SP, CS, now_nanos):
     EsccCarController.update(self, CS)
@@ -113,11 +112,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # Common shared configuration
     can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
-
-    if self.run_once:
-      self.run_once = False
-      can_sends.append(hyundaican.set_auto_start_stop(self.packer, self.CP, CS.lvr12))
-      can_sends.append(hyundaican.set_drive_mode(self.packer, self.CP, CS.msg_463))
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD:
