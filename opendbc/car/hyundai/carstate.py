@@ -382,7 +382,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     }
 
   def get_can_parsers(self, CP, CP_SP):
-    if CP.flags & HyundaiFlags.CANFD:
+    if CP.flags & HyundaiFlags.CANFD and not (CP.flags & HyundaiFlags.CAN_CANFD_BLENDED):
       return self.get_can_parsers_canfd(CP)
 
     pt_messages = [
@@ -402,7 +402,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     ]
 
     if not CP.openpilotLongitudinalControl:
-      pt_messages.append(("SCC12", 50))
+      if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+        pt_messages.append(("SCC12", 50))
 
     if CP.enableBsm:
       pt_messages.append(("LCA11", 20 if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 50))

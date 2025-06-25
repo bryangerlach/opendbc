@@ -83,10 +83,8 @@ const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
 #define HYUNDAI_COMMON_RX_CHECKS(legacy, can_canfd_blended, pt_bus)                                                                                                                                               \
   {.msg = {{0x260, (pt_bus), 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
            {0x371, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 100U}, { 0 }}},                                                    \
-  {.msg = {{0x386, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}}, \
-  {.msg = {{0x394, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}},  \
-  {.msg = {{0x251, (pt_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                              \
-  {.msg = {{0x4F1, (pt_bus), 4, .ignore_checksum = true, .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                                  \
+  {.msg = {{0x386, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U :100U}, { 0 }, { 0 }}}, \
+  {.msg = {{0x394, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}},                                             \
 
 #define HYUNDAI_SCC11_ADDR_CHECK(scc_bus)                                                                                                         \
   {.msg = {{0x420, (scc_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
@@ -160,7 +158,7 @@ static uint32_t hyundai_get_checksum(const CANPacket_t *to_push) {
 static uint32_t hyundai_compute_checksum(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
 
-  uint8_t chksum = 0;
+  uint16_t chksum = 0;
   if (addr == 0x386) {
     // count the bits
     for (int i = 0; i < 8; i++) {

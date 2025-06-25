@@ -45,7 +45,11 @@ class CarInterface(CarInterfaceBase):
         # this needs to be figured out for cars without an ADAS ECU
         ret.alphaLongitudinalAvailable = False
 
-      ret.enableBsm = 0x1e5 in fingerprint[CAN.ECAN]
+      if not ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+        ret.enableBsm = 0x1e5 in fingerprint[CAN.ECAN]
+      else:
+        bus = CAN.ECAN if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
+        ret.enableBsm = 0x58b in fingerprint[bus]
 
       # Check if the car is hybrid. Only HEV/PHEV cars have 0xFA on E-CAN.
       if 0xFA in fingerprint[CAN.ECAN]:
@@ -75,6 +79,8 @@ class CarInterface(CarInterfaceBase):
       if CAN.ECAN >= 4:
         cfgs.insert(0, get_safety_config(structs.CarParams.SafetyModel.noOutput))
       ret.safetyConfigs = cfgs
+      if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+          ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAN_CANFD_BLENDED.value
 
       if ret.flags & HyundaiFlags.CANFD_LKA_STEERING:
         ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CANFD_LKA_STEERING.value
@@ -149,6 +155,9 @@ class CarInterface(CarInterfaceBase):
     ret.vEgoStarting = 0.1
     ret.startAccel = 1.0
     ret.longitudinalActuatorDelay = 0.5
+
+    if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      ret.stoppingDecelRate = 0.4
 
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.LONG.value

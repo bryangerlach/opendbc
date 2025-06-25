@@ -24,7 +24,7 @@ class CarControllerParams:
     self.STEER_THRESHOLD = 150
     self.STEER_STEP = 1  # 100 Hz
 
-    if CP.flags & HyundaiFlags.CANFD:
+    if CP.flags & HyundaiFlags.CANFD and not (CP.flags & HyundaiFlags.CAN_CANFD_BLENDED):
       self.STEER_MAX = 270
       self.STEER_DRIVER_ALLOWANCE = 250
       self.STEER_DRIVER_MULTIPLIER = 2
@@ -69,6 +69,7 @@ class HyundaiSafetyFlags(IntFlag):
   CANFD_LKA_STEERING_ALT = 128
   FCEV_GAS = 256
   ALT_LIMITS_2 = 512
+  CAN_CANFD_BLENDED = 1024
 
 
 class HyundaiFlags(IntFlag):
@@ -159,9 +160,6 @@ class HyundaiPlatformConfig(PlatformConfig):
     if self.flags & HyundaiFlags.MIN_STEER_32_MPH:
       self.specs = self.specs.override(minSteerSpeed=32 * CV.MPH_TO_MS)
 
-    if self.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      self.dbc_dict = {Bus.pt: "hyundai_palisade_2023_generated"}
-
 
 @dataclass
 class HyundaiCanFDPlatformConfig(PlatformConfig):
@@ -169,6 +167,9 @@ class HyundaiCanFDPlatformConfig(PlatformConfig):
 
   def init(self):
     self.flags |= HyundaiFlags.CANFD
+
+    if self.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      self.dbc_dict = {Bus.pt: "hyundai_palisade_2023_generated"}
 
 
 class CAR(Platforms):
@@ -342,7 +343,7 @@ class CAR(Platforms):
     CarSpecs(mass=1999, wheelbase=2.9, steerRatio=15.6 * 1.15, tireStiffnessFactor=0.63),
     flags=HyundaiFlags.MANDO_RADAR | HyundaiFlags.CHECKSUM_CRC8,
   )
-  HYUNDAI_PALISADE_2023 = HyundaiPlatformConfig(
+  HYUNDAI_PALISADE_2023 = HyundaiCanFDPlatformConfig(
     [
       HyundaiCarDocs("Hyundai Palisade (with HDA II) 2023-24", "All", car_parts=CarParts.common([CarHarness.hyundai_r])),
       HyundaiCarDocs("Kia Telluride (with HDA II) 2023-24", "All", car_parts=CarParts.common([CarHarness.hyundai_p])),
