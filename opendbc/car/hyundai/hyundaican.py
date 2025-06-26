@@ -211,8 +211,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
-  can_canfd_blended = CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
-  bus = CanBus(CP).ECAN if can_canfd_blended else 0
+  bus = 0
 
   def get_scc11_values():
     return {
@@ -393,7 +392,7 @@ def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
   scc13_values = get_scc13_values()
-  commands.append(packer.make_can_msg("SCC13", CAN.ECAN, scc13_values))
+  commands.append(packer.make_can_msg("SCC13", 0, scc13_values))
 
   # If ESCC is available and enabled, we skip FCA12, since ESCC does not block FCA12
   if ESCC and ESCC.enabled:
@@ -446,12 +445,12 @@ def create_radar_aux_messages(packer, CAN, frame):
       values["COUNTER"] = frame % 0xF
       checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
       values["CHECKSUM"] = checksum
-      ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
+      ret.append(packer.make_can_msg(addr, 0, values))
 
   return ret
 
 def create_checksum_can_canfd_blended(packer, CAN, addr, values):
-  dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
+  dat = packer.make_can_msg(addr, 0, values)[1]
   dat = dat[1:8]
   checksum = hyundai_checksum(dat)
 
