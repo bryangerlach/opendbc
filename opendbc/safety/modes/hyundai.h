@@ -120,22 +120,18 @@ static uint32_t hyundai_compute_checksum(const CANPacket_t *to_push) {
     }
     chksum = (chksum ^ 9U) & 15U;
   } else {
-    if (hyundai_can_canfd_blended && (addr == 0x421)) {
-      chksum = hyundai_common_canfd_compute_checksum(to_push);
-    } else {
-      // sum of nibbles
-      for (int i = 0; i < 8; i++) {
-        if ((addr == 0x394) && (i == 7)) {
-          continue; // exclude
-        }
-        uint8_t b = GET_BYTE(to_push, i);
-        if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
-          b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
-        }
-        chksum += (b % 16U) + (b / 16U);
+    // sum of nibbles
+    for (int i = 0; i < 8; i++) {
+      if ((addr == 0x394) && (i == 7)) {
+        continue; // exclude
       }
-      chksum = (16U - (chksum %  16U)) % 16U;
+      uint8_t b = GET_BYTE(to_push, i);
+      if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
+        b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
+      }
+      chksum += (b % 16U) + (b / 16U);
     }
+    chksum = (16U - (chksum % 16U)) % 16U;
   }
 
   return chksum;
@@ -322,6 +318,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
+    hyundai_longitudinal = false;
   }
 
 
