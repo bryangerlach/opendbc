@@ -26,16 +26,17 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 };
 
 #define HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
-  {0x340, 0,                           8, .check_relay = false},  /* LKAS11 Bus 0                              */ \
+  {0x340, 0,                           8, .check_relay = true},  /* LKAS11 Bus 0                              */ \
   {0x4F1, scc_bus,                     4, .check_relay = false},  /* CLU11 Bus 0 (radar-SCC) or 2 (camera-SCC) */ \
-  {0x485, 0, (can_canfd_blended) ? 8 : 4, .check_relay = false},  /* LFAHDA_MFC Bus 0, dynamic message size    */ \
-  {0x364, 0,                           8, .check_relay = false}, /* ALERTS_364*/ \
+  {0x485, 0, (can_canfd_blended) ? 8 : 4, .check_relay = true},  /* LFAHDA_MFC Bus 0, dynamic message size    */ \
+  {0x364, 0,                           8, .check_relay = true}, /* ALERTS_364*/ \
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
-  {0x420, scc_bus,       8, .check_relay = false},   /* SCC11 Bus 0       */ \
-  {0x421, scc_bus,       8, .check_relay = false},   /* SCC12 Bus 0       */ \
-  {0x389, scc_bus,       8, .check_relay = false},   /* SCC14 Bus 0       */ \
+  {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
+  {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
+  {0x50A, 0,             8, .check_relay = true},   /* SCC13 Bus 0       */ \
+  {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
@@ -230,26 +231,26 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // ACCEL: safety check
-    if (((addr == 0x420) && hyundai_can_canfd_blended) || ((addr == 0x421) && !hyundai_can_canfd_blended)) {
-      int desired_accel_raw = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 4) & 0x3FU) << 5) | (GET_BYTE(to_send, 3) >> 3)) - 1023U :
-                                                              (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
-      int desired_accel_val = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 3) & 0x7U) << 8) | GET_BYTE(to_send, 2)) - 1023U :
-                                                              ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
+  if (addr == 0x421) {
+    int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
+    int desired_accel_val = ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
 
-      int aeb_decel_cmd = hyundai_can_canfd_blended ? 0 : GET_BYTE(to_send, 2);
-      bool aeb_req = hyundai_can_canfd_blended ? 0 : GET_BIT(to_send, 54U);
+    int aeb_decel_cmd = GET_BYTE(to_send, 2);
+    bool aeb_req = GET_BIT(to_send, 54U);
 
-      bool violation = false;
+    bool violation = false;
 
-      violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
-      violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
+    violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
+    violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
+    if (!hyundai_escc) {
       violation |= (aeb_decel_cmd != 0);
       violation |= aeb_req;
-
-      if (violation) {
-        tx = false;
-      }
     }
+
+    if (violation) {
+      tx = false;
+    }
+  }
 
   // LKA STEER: safety check
   if (addr == 0x340) {
@@ -303,10 +304,7 @@ static safety_config hyundai_init(uint16_t param) {
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
-    HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
-      {0x2A4, 1, 24, .check_relay = false},
-      {0x363, 2, 8, .check_relay = false},
-      {0x398, 0, 8, .check_relay = false},
+    HYUNDAI_COMMON_TX_MSGS(0, true)
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
@@ -317,7 +315,7 @@ static safety_config hyundai_init(uint16_t param) {
   hyundai_legacy = false;
 
   if (hyundai_can_canfd_blended) {
-    gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
+    //gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
     hyundai_longitudinal = false;
   }
 
