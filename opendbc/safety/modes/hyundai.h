@@ -231,7 +231,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // ACCEL: safety check
-  if (addr == 0x421) {
+  if (addr == 0x420) {
     int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
     int desired_accel_val = ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
 
@@ -304,7 +304,7 @@ static safety_config hyundai_init(uint16_t param) {
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
-    HYUNDAI_COMMON_TX_MSGS(0, true)
+    HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
