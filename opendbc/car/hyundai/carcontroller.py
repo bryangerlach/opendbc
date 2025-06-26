@@ -97,9 +97,12 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # *** common hyundai stuff ***
 
+    # Common shared configuration
+    can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
+
     # tester present - w/ no response (keeps relevant ECU disabled)
     if self.frame % 100 == 0 and not ((self.CP.flags & HyundaiFlags.CANFD_CAMERA_SCC) or self.ESCC.enabled) and \
-            self.CP.openpilotLongitudinalControl:
+            self.CP.openpilotLongitudinalControl and not can_canfd_blended:
       # for longitudinal control, either radar or ADAS driving ECU
       addr, bus = 0x7d0, self.CAN.ECAN if self.CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED) else 0
       if self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
@@ -110,8 +113,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       if self.CP.flags & HyundaiFlags.ENABLE_BLINKERS:
         can_sends.append(make_tester_present_msg(0x7b1, self.CAN.ECAN, suppress_response=True))
 
-    # Common shared configuration
-    can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
+
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD:

@@ -322,7 +322,6 @@ static safety_config hyundai_init(uint16_t param) {
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
-    hyundai_longitudinal = false;
   }
 
 
