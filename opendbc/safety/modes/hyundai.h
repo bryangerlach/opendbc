@@ -35,7 +35,6 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
   {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
   {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
-  {0x50A, 0,             8, .check_relay = true},   /* SCC13 Bus 0       */ \
   {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
 
@@ -121,18 +120,22 @@ static uint32_t hyundai_compute_checksum(const CANPacket_t *to_push) {
     }
     chksum = (chksum ^ 9U) & 15U;
   } else {
-    // sum of nibbles
-    for (int i = 0; i < 8; i++) {
-      if ((addr == 0x394) && (i == 7)) {
-        continue; // exclude
+    if (hyundai_can_canfd_blended && (addr == 0x421)) {
+      chksum = hyundai_common_canfd_compute_checksum(to_push);
+    } else {
+      // sum of nibbles
+      for (int i = 0; i < 8; i++) {
+        if ((addr == 0x394) && (i == 7)) {
+          continue; // exclude
+        }
+        uint8_t b = GET_BYTE(to_push, i);
+        if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
+          b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
+        }
+        chksum += (b % 16U) + (b / 16U);
       }
-      uint8_t b = GET_BYTE(to_push, i);
-      if (((addr == 0x260) && (i == 7)) || ((addr == 0x394) && (i == 6)) || ((addr == 0x421) && (i == 7))) {
-        b &= (addr == 0x421) ? 0x0FU : 0xF0U; // remove checksum
-      }
-      chksum += (b % 16U) + (b / 16U);
+      chksum = (16U - (chksum %  16U)) % 16U;
     }
-    chksum = (16U - (chksum % 16U)) % 16U;
   }
 
   return chksum;
@@ -232,8 +235,8 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
 
   // ACCEL: safety check
   if (addr == 0x420) {
-    int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
-    int desired_accel_val = ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
+    int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x3FU) << 5) | (GET_BYTE(to_send, 3) >> 3)) - 1023U;
+    int desired_accel_val = (((GET_BYTE(to_send, 3) & 0x7U) << 8) | GET_BYTE(to_send, 2)) - 1023U;
 
     int aeb_decel_cmd = GET_BYTE(to_send, 2);
     bool aeb_req = GET_BIT(to_send, 54U);
@@ -285,6 +288,24 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   return tx;
+}
+
+static int hyundai_fwd_hook(int bus_num, int addr) {
+
+  int bus_fwd = -1;
+
+  // forward cam to ccan and viceversa, except lkas cmd
+  if (bus_num == 0) {
+    int is_scc = (addr == 0x420 || addr == 0x421);
+    if (!is_scc) {
+      bus_fwd = 2;
+    }
+  }
+  if (bus_num == 2) {
+    bus_fwd = 0;
+  }
+
+  return bus_fwd;
 }
 
 static safety_config hyundai_init(uint16_t param) {
