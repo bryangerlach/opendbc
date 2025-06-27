@@ -290,24 +290,6 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   return tx;
 }
 
-static int hyundai_fwd_hook(int bus_num, int addr) {
-
-  int bus_fwd = -1;
-
-  // forward cam to ccan and viceversa, except lkas cmd
-  if (bus_num == 0) {
-    int is_scc = (addr == 0x420 || addr == 0x421);
-    if (!is_scc) {
-      bus_fwd = 2;
-    }
-  }
-  if (bus_num == 2) {
-    bus_fwd = 0;
-  }
-
-  return bus_fwd;
-}
-
 static safety_config hyundai_init(uint16_t param) {
   static const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, false)
