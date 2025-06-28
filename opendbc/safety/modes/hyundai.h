@@ -38,6 +38,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
   {0x363, scc_bus,       8, .check_relay = false}, \
+  {0x2A4, 1,             8, .check_relay = true}, \
   {0x398, scc_bus,       8, .check_relay = false}, \
   {0x399, scc_bus,       8, .check_relay = false}, \
 
@@ -324,7 +325,7 @@ static safety_config hyundai_init(uint16_t param) {
   hyundai_legacy = false;
 
   if (hyundai_can_canfd_blended) {
-    //gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
+    gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
     hyundai_longitudinal = false;
   }
 
