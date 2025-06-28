@@ -382,6 +382,7 @@ static safety_config hyundai_init(uint16_t param) {
   } else if (hyundai_can_canfd_blended) {
     static RxCheck hyundai_can_canfd_blended_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false)
+      HYUNDAI_SCC11_ADDR_CHECK(2)
       HYUNDAI_SCC12_ADDR_CHECK(2, true)
     };
 
