@@ -211,7 +211,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
-  bus = CAN.CAM
+  bus = CAN.ECAN
 
   def get_scc11_values():
     return {
@@ -422,21 +422,6 @@ def create_radar_aux_messages(packer, CAN, frame):
     ("RADAR_0x398", 5,  {
       "BYTE4": 0x80,
       "BYTE5": 0x5D,
-    }),
-    ("RADAR_0x399", 5,  {
-      "BYTE2": 0x02,
-    }),
-    ("RADAR_0x39a", 5,  {
-      "BYTE7": 0xFF,
-    }),
-    ("RADAR_0x39b", 5,  {
-    }),
-    ("RADAR_0x39c", 5,  {
-      "BYTE5": 0xE0,
-      "BYTE6": 0x79,
-    }),
-    ("RADAR_0x43a", 20, {
-      "BYTE2": 0x07,
     }),
   ]
 
