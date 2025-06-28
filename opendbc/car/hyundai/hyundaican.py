@@ -211,7 +211,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
-  bus = 2
+  bus = CAN.ECAN
 
   def get_scc11_values():
     return {
