@@ -38,7 +38,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
   {0x363, scc_bus,       8, .check_relay = false}, \
-  {0x2A4, 1,             8, .check_relay = true}, \
+  {0x2A4, 1,            24, .check_relay = true}, \
   {0x398, scc_bus,       8, .check_relay = false}, \
   {0x399, scc_bus,       8, .check_relay = false}, \
 
