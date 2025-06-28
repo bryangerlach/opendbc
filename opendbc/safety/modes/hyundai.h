@@ -307,6 +307,7 @@ static safety_config hyundai_init(uint16_t param) {
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
+    HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
     HYUNDAI_LONG_COMMON_TX_MSGS(2, true)
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x483, 0, 8, .check_relay = false}, // FCA12 Bus 0
