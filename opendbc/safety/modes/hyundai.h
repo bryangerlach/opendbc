@@ -35,7 +35,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
   {0x420, scc_bus,       8, .check_relay = false},   /* SCC11 Bus 0       */ \
   {0x421, scc_bus,       8, .check_relay = false},   /* SCC12 Bus 0       */ \
-  {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
+  {0x389, scc_bus,       8, .check_relay = false},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
   {0x363, scc_bus,       8, .check_relay = false}, \
   {0x398, scc_bus,       8, .check_relay = false}, \
@@ -318,7 +318,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
-  };
+  }
 
   hyundai_common_init(param);
   hyundai_legacy = false;
