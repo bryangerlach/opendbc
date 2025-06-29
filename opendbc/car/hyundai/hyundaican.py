@@ -211,7 +211,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
-  bus = CAN.ECAN
+  bus = CAN.ACAN
 
   def get_scc11_values():
     return {
@@ -406,11 +406,11 @@ def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
 
   return commands
 
-def create_frt_radar_opt(packer):
+def create_frt_radar_opt(packer, CAN):
   frt_radar11_values = {
     "CF_FCA_Equip_Front_Radar": 1,
   }
-  return packer.make_can_msg("FRT_RADAR11", 0, frt_radar11_values)
+  return packer.make_can_msg("FRT_RADAR11", CAN.ECAN, frt_radar11_values)
 
 def create_radar_aux_messages(packer, CAN, frame):
   ret = []
