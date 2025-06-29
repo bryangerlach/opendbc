@@ -33,12 +33,10 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
-  {0x420, scc_bus,       8, .check_relay = false},   /* SCC11 Bus 0       */ \
+  {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
   {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
   {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
-  {0x363, scc_bus,       8, .check_relay = false}, \
-  {0x398, scc_bus,       8, .check_relay = false}, \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
   {.msg = {{0x260, 0, 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
@@ -309,6 +307,10 @@ static safety_config hyundai_init(uint16_t param) {
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
+    HYUNDAI_COMMON_TX_MSGS(0, true)
+  };
+
+  static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
@@ -323,12 +325,12 @@ static safety_config hyundai_init(uint16_t param) {
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
-    hyundai_longitudinal = false;
+    //hyundai_longitudinal = false;
   }
 
 
   safety_config ret;
-  if (hyundai_longitudinal) {
+  if (hyundai_longitudinal && !hyundai_can_canfd_blended) {
     // Use CLU11 (buttons) to manage controls allowed instead of SCC cruise state
     static RxCheck hyundai_long_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false)
@@ -385,8 +387,11 @@ static safety_config hyundai_init(uint16_t param) {
       HYUNDAI_COMMON_RX_CHECKS(false)
       HYUNDAI_SCC12_ADDR_CHECK(0, true)
     };
-
-    ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS);
+    if (hyundai_longitudinal) {
+      ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS);
+    } else {
+      ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS);
+    }
   } else {
     static RxCheck hyundai_rx_checks[] = {
        HYUNDAI_COMMON_RX_CHECKS(false)
