@@ -316,7 +316,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
-  }
+  };
 
   hyundai_common_init(param);
   hyundai_legacy = false;
