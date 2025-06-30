@@ -403,9 +403,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ("CGW4", 5),
       ("WHL_SPD11", 50),
       ("SAS11", 100),
-      ("SCC11", 50),
-      ("SCC12", 50),
-      ("SCC14", 50),
     ]
 
     if not CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CAMERA_SCC):
