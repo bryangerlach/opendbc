@@ -293,8 +293,9 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
 static bool hyundai_fwd_hook(int bus_num, int addr) {
 
   bool block_msg = false;
-
-  block_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
+  if (bus_num == 0) {
+    block_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
+  }
 
   return block_msg;
 }
