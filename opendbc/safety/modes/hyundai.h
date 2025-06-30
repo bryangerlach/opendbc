@@ -218,7 +218,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   int addr = GET_ADDR(to_send);
 
   // FCA11: Block any potential actuation
-  if (addr == 0x38D) {
+  if (addr == 0x38D && !hyundai_can_canfd_blended) {
     int CR_VSM_DecCmd = GET_BYTE(to_send, 1);
     bool FCA_CmdAct = GET_BIT(to_send, 20U);
     bool CF_VSM_DecCmdAct = GET_BIT(to_send, 31U);
@@ -228,27 +228,22 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     }
   }
 
-  if (addr == 0x420) {
-    acc_main_on_tx = GET_BIT(to_send, 0U);
-    hyundai_common_acc_main_on_sync();
-  }
-
   // ACCEL: safety check
-  if (addr == 0x420) {
-    int desired_accel_raw = (((GET_BYTE(to_send, 4) & 0x3FU) << 5) | (GET_BYTE(to_send, 3) >> 3)) - 1023U;
-    int desired_accel_val = (((GET_BYTE(to_send, 3) & 0x7U) << 8) | GET_BYTE(to_send, 2)) - 1023U;
+  if (((addr == 0x420) && hyundai_can_canfd_blended) || ((addr == 0x421) && !hyundai_can_canfd_blended)) {
+    int desired_accel_raw = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 4) & 0x3FU) << 5) | (GET_BYTE(to_send, 3) >> 3)) - 1023U :
+                                                            (((GET_BYTE(to_send, 4) & 0x7U) << 8) | GET_BYTE(to_send, 3)) - 1023U;
+    int desired_accel_val = hyundai_can_canfd_blended ? (((GET_BYTE(to_send, 3) & 0x7U) << 8) | GET_BYTE(to_send, 2)) - 1023U :
+                                                            ((GET_BYTE(to_send, 5) << 3) | (GET_BYTE(to_send, 4) >> 5)) - 1023U;
 
-    int aeb_decel_cmd = 0;
-    bool aeb_req = 0;
+    int aeb_decel_cmd = hyundai_can_canfd_blended ? 0 : GET_BYTE(to_send, 2);
+    bool aeb_req = hyundai_can_canfd_blended ? 0 : GET_BIT(to_send, 54U);
 
     bool violation = false;
 
     violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
     violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
-    if (!hyundai_escc) {
-      violation |= (aeb_decel_cmd != 0);
-      violation |= aeb_req;
-    }
+    violation |= (aeb_decel_cmd != 0);
+    violation |= aeb_req;
 
     if (violation) {
       tx = false;
@@ -287,8 +282,6 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     }
   }
 
-  tx = true;
-
   return tx;
 }
 
@@ -313,9 +306,10 @@ static safety_config hyundai_init(uint16_t param) {
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
-    HYUNDAI_LONG_COMMON_TX_MSGS(2, true)
+    HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
     {0x38D, 0, 8, .check_relay = true}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
+    {0x443, 0, 16, .check_relay = true},
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
@@ -390,9 +384,9 @@ static safety_config hyundai_init(uint16_t param) {
       HYUNDAI_SCC12_ADDR_CHECK(0, true)
     };
     if (hyundai_longitudinal) {
-      ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS);
-    } else {
       ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS);
+    } else {
+      ret = BUILD_SAFETY_CFG(hyundai_can_canfd_blended_rx_checks, HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS);
     }
   } else {
     static RxCheck hyundai_rx_checks[] = {
