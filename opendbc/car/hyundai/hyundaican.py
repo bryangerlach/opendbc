@@ -406,7 +406,7 @@ def create_radar_aux_messages(packer, CAN, frame):
   return ret
 
 def create_checksum_can_canfd_blended(packer, CAN, addr, values):
-  dat = packer.make_can_msg(addr, 0, values)[1]
+  dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
   dat = dat[1:8]
   checksum = hyundai_checksum(dat)
 
