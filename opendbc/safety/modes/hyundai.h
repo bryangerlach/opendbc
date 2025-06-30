@@ -294,7 +294,6 @@ static bool hyundai_fwd_hook(int bus_num, int addr) {
 
   bool block_msg = false;
 
-  bool is_brake_msg = addr == 0x1FA;
   block_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
 
   return block_msg;
