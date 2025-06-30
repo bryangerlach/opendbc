@@ -213,16 +213,15 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
   bus = CAN.ECAN
 
-  def get_scc11_values():
-    return {
+  msg_values = [
+    ("SCC11", {
       "aReqRaw": tuning.desired_accel,
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-    }
+    }),
 
-  def get_scc12_values():
-    return {
+    ("SCC12", {
       "MainMode_ACC": 1,
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
@@ -230,52 +229,26 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACC_ObjDist": 1,
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if stopping else 0,
-    }
+    }),
 
-  def calculate_scc12_checksum(values):
-    scc12_dat = packer.make_can_msg("SCC12", bus, values)[1]
-    scc12_dat = scc12_dat[1:8]
-    checksum = hyundai_checksum(scc12_dat)
-    values["CR_VSM_ChkSum"] = checksum
-    return values
-
-  def get_scc14_values():
-    return {
+    ("SCC14", {
       "ACC_ObjLatPos": 0,
       "ObjValid": 0,
       "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
-    }
+    }),
 
-  def get_fca11_values():
-    return {
+    ("FCA11", {
       "BYTE4": 0xC0,
       "BYTE5": 0x3F,
       "BYTE6": 0x7F,
-    }
+    }),
+  ]
 
-  def calculate_fca11_checksum(values):
-    fca11_dat = packer.make_can_msg("FCA11", bus, values)[1]
-    fca11_dat = fca11_dat[1:8]
-    checksum = hyundai_checksum(fca11_dat)
-    values["CR_FCA_ChkSum"] = checksum
-    return values
-
-  scc11_values = get_scc11_values()
-  commands.append(packer.make_can_msg("SCC11", bus, scc11_values))
-
-  scc12_values = get_scc12_values()
-  scc12_values = calculate_scc12_checksum(scc12_values)
-  commands.append(packer.make_can_msg("SCC12", bus, scc12_values))
-
-  scc14_values = get_scc14_values()
-  commands.append(packer.make_can_msg("SCC14", bus, scc14_values))
-
-  if use_fca and not ((CP.flags & HyundaiFlags.CAMERA_SCC) or (ESCC and ESCC.enabled)):
-    # note that some vehicles most likely have an alternate checksum/counter definition
-    # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
-    fca11_values = get_fca11_values()
-    fca11_values = calculate_fca11_checksum(fca11_values)
-    commands.append(packer.make_can_msg("FCA11", bus, fca11_values))
+  for addr, values in msg_values:
+    values["COUNTER"] = idx % 0xF
+    checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+    values["CHECKSUM"] = checksum
+    commands.append(packer.make_can_msg(addr, CAN.ECAN, values))
 
   return commands
 

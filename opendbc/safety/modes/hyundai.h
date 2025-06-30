@@ -290,16 +290,6 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   return tx;
 }
 
-static bool hyundai_fwd_hook(int bus_num, int addr) {
-
-  bool block_msg = false;
-  if (bus_num == 0 || bus_num == 2) {
-    block_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
-  }
-
-  return block_msg;
-}
-
 static safety_config hyundai_init(uint16_t param) {
   static const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, false)
@@ -468,7 +458,6 @@ const safety_hooks hyundai_hooks = {
   .init = hyundai_init,
   .rx = hyundai_rx_hook,
   .tx = hyundai_tx_hook,
-  .fwd = hyundai_fwd_hook,
   .get_counter = hyundai_get_counter,
   .get_checksum = hyundai_get_checksum,
   .compute_checksum = hyundai_compute_checksum,
@@ -478,7 +467,6 @@ const safety_hooks hyundai_legacy_hooks = {
   .init = hyundai_legacy_init,
   .rx = hyundai_rx_hook,
   .tx = hyundai_tx_hook,
-  .fwd = hyundai_fwd_hook,
   .get_counter = hyundai_get_counter,
   .get_checksum = hyundai_get_checksum,
   .compute_checksum = hyundai_compute_checksum,
