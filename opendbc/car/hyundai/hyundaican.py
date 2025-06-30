@@ -244,9 +244,9 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
   for addr, values in msg_values:
     values["COUNTER"] = idx % 0xF
-    checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+    checksum = create_checksum_can_canfd_blended(packer, CAN.ACAN, addr, values)
     values["CHECKSUM"] = checksum
-    commands.append(packer.make_can_msg(addr, CAN.ECAN, values))
+    commands.append(packer.make_can_msg(addr, CAN.ACAN, values))
 
   return commands
 
@@ -399,14 +399,14 @@ def create_radar_aux_messages(packer, CAN, frame):
   for addr, freq, values in msg_values:
     if frame % freq == 0:
       values["COUNTER"] = frame % 0xF
-      checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
+      checksum = create_checksum_can_canfd_blended(packer, CAN.ECAN, addr, values)
       values["CHECKSUM"] = checksum
       ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
 
   return ret
 
-def create_checksum_can_canfd_blended(packer, CAN, addr, values):
-  dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
+def create_checksum_can_canfd_blended(packer, bus, addr, values):
+  dat = packer.make_can_msg(addr, bus, values)[1]
   dat = dat[1:8]
   checksum = hyundai_checksum(dat)
 
