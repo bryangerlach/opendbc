@@ -290,30 +290,14 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   return tx;
 }
 
-static int hyundai_fwd_hook(int bus_num, int addr) {
+static bool hyundai_fwd_hook(int bus_num, int addr) {
 
-  int bus_fwd = -1;
+  bool block_msg = false;
 
-  // forward cam to ccan and viceversa, except lkas cmd
-  if (bus_num == 0) {
-    bus_fwd = 2;
-  }
-  if (bus_num == 2) {
-    // LKAS11 for CAN, LKAS for CAN/CAN-FD
-    int is_lkas11_msg = (addr == 0x340) && !hyundai_can_canfd_blended;
-    int is_lkas_msg = ((addr == 0x50) || (addr == 0x2a4)) && hyundai_can_canfd_blended;
-    int is_scc_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
+  bool is_brake_msg = addr == 0x1FA;
+  block_msg = (addr == 0x420 || addr == 0x421 || addr == 0x389);
 
-    // LFAHDA_MFC for CAN
-    int is_lfahda_msg = (addr == 0x485) && !hyundai_can_canfd_blended;
-
-    int block_msg = is_lkas11_msg || is_lkas_msg || is_lfahda_msg || is_scc_msg;
-    if (!block_msg) {
-      bus_fwd = 0;
-    }
-  }
-
-  return bus_fwd;
+  return block_msg;
 }
 
 static safety_config hyundai_init(uint16_t param) {
