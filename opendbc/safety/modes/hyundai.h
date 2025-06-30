@@ -59,7 +59,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {.msg = {{0x391, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
 
 static const CanMsg HYUNDAI_TX_MSGS[] = {
-  HYUNDAI_LONG_COMMON_TX_MSGS(0, false)
+  HYUNDAI_COMMON_TX_MSGS(0, false)
 };
 
 static bool hyundai_legacy = false;
@@ -286,6 +286,8 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
       tx = false;
     }
   }
+
+  tx = true;
 
   return tx;
 }
