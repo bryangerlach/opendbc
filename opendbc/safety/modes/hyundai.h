@@ -30,46 +30,43 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x4F1, scc_bus, 4, .check_relay = false},  /* CLU11 Bus 0 (radar-SCC) or 2 (camera-SCC) */ \
   {0x485, 0,       4, .check_relay = true},   /* LFAHDA_MFC Bus 0                          */ \
 
-const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
-  {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = false},
-  {0x2A4, 0, 24, .check_relay = true},
-};
+#define HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS() \
+  {0x50, 0, 16, .check_relay = true}, \
+  {0x4F1, 1, 4, .check_relay = true}, \
+  {0x2A4, 0, 24, .check_relay = true}, \
 
-const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
-  {0x340, 0, 8, .check_relay = false}, // LKAS11 Bus 0
-  {0x4F1, 0, 4, .check_relay = false}, // CLU11 Bus 0
-  {0x485, 0, 4, .check_relay = false}, // LFAHDA_MFC Bus 0
-  {0x420, 0, 8, .check_relay = false}, // SCC11 Bus 0
-  {0x421, 0, 8, .check_relay = false}, // SCC12 Bus 0
-  {0x50A, 0, 8, .check_relay = false}, // SCC13 Bus 0
-  {0x389, 0, 8, .check_relay = false}, // SCC14 Bus 0
-  {0x4A2, 0, 2, .check_relay = false}, // FRT_RADAR11 Bus 0
-  {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
-  {0x483, 0, 8, .check_relay = false}, // FCA12 Bus 0
-  {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
-};
+#define HYUNDAI_LONG_TX_MSGS() \
+  {0x340, 0, 8, .check_relay = false}, /* LKAS11 Bus 0 */ \
+  {0x4F1, 0, 4, .check_relay = false}, /* CLU11 Bus 0 */ \
+  {0x485, 0, 4, .check_relay = false}, /* LFAHDA_MFC Bus 0 */ \
+  {0x420, 0, 8, .check_relay = false}, /* SCC11 Bus 0 */ \
+  {0x421, 0, 8, .check_relay = false}, /* SCC12 Bus 0 */ \
+  {0x50A, 0, 8, .check_relay = false}, /* SCC13 Bus 0 */ \
+  {0x389, 0, 8, .check_relay = false}, /* SCC14 Bus 0 */ \
+  {0x4A2, 0, 2, .check_relay = false}, /* FRT_RADAR11 Bus 0 */ \
+  {0x38D, 0, 8, .check_relay = false}, /* FCA11 Bus 0 */ \
+  {0x483, 0, 8, .check_relay = false}, /* FCA12 Bus 0 */ \
+  {0x7D0, 0, 8, .check_relay = false}, /* radar UDS TX addr Bus 0 (for radar disable) */ \
 
-const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
-  {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = false},
-  {0x2A4, 0, 24, .check_relay = true},
-  {0x51, 0, 32, .check_relay = false},
-  {0x730, 1, 8, .check_relay = false},
-  {0x340, 1, 8, .check_relay = false},
-  {0x485, 1, 8, .check_relay = false},
-  {0x420, 1, 8, .check_relay = false},
-  {0x421, 1, 8, .check_relay = false},
-  {0x389, 1, 8, .check_relay = false},
-  {0x38D, 1, 8, .check_relay = false},
-  {0x363, 1, 8, .check_relay = false},
-  {0x398, 1, 8, .check_relay = false},
-  {0x399, 1, 8, .check_relay = false},
-  {0x39a, 1, 8, .check_relay = false},
-  {0x39b, 1, 8, .check_relay = false},
-  {0x39c, 1, 8, .check_relay = false},
-  {0x43a, 1, 8, .check_relay = false},
-};
+#define HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS() \
+  {0x50, 0, 16, .check_relay = true}, \
+  {0x4F1, 1, 4, .check_relay = false}, \
+  {0x2A4, 0, 24, .check_relay = true}, \
+  {0x51, 0, 32, .check_relay = false}, \
+  {0x730, 1, 8, .check_relay = false}, \
+  {0x340, 1, 8, .check_relay = false}, \
+  {0x485, 1, 8, .check_relay = false}, \
+  {0x420, 1, 8, .check_relay = false}, \
+  {0x421, 1, 8, .check_relay = false}, \
+  {0x389, 1, 8, .check_relay = false}, \
+  {0x38D, 1, 8, .check_relay = false}, \
+  {0x363, 1, 8, .check_relay = false}, \
+  {0x398, 1, 8, .check_relay = false}, \
+  {0x399, 1, 8, .check_relay = false}, \
+  {0x39a, 1, 8, .check_relay = false}, \
+  {0x39b, 1, 8, .check_relay = false}, \
+  {0x39c, 1, 8, .check_relay = false}, \
+  {0x43a, 1, 8, .check_relay = false}, \
 
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus) \
