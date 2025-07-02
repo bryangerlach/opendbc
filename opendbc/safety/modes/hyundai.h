@@ -33,9 +33,9 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
-  {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
-  {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
-  {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
+  {0x420, scc_bus,       8, .check_relay = false},   /* SCC11 Bus 0       */ \
+  {0x421, scc_bus,       8, .check_relay = false},   /* SCC12 Bus 0       */ \
+  {0x389, scc_bus,       8, .check_relay = false},   /* SCC14 Bus 0       */ \
   {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
@@ -303,6 +303,9 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
     HYUNDAI_COMMON_TX_MSGS(0, true)
+    {0x420, 0,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
+    {0x421, 0,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
+    {0x389, 0,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
