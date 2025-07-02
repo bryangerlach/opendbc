@@ -251,7 +251,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     values["COUNTER"] = idx % 0xF
     checksum = create_checksum_can_canfd_blended(packer, CAN.ACAN, addr, values)
     values["CHECKSUM"] = checksum
-    commands.append(packer.make_can_msg(addr, CAN.ACAN, values))
+    commands.append(packer.make_can_msg(addr, CAN.CAM, values))
 
   return commands
 
