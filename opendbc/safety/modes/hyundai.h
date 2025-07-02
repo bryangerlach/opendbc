@@ -33,10 +33,9 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 #define HYUNDAI_LONG_COMMON_TX_MSGS(scc_bus, can_canfd_blended) \
   HYUNDAI_COMMON_TX_MSGS(scc_bus, can_canfd_blended)                    \
-  {0x420, scc_bus,       8, .check_relay = false},   /* SCC11 Bus 0       */ \
-  {0x421, scc_bus,       8, .check_relay = false},   /* SCC12 Bus 0       */ \
-  {0x389, scc_bus,       8, .check_relay = false},   /* SCC14 Bus 0       */ \
-  {0x4A2, scc_bus,       2, .check_relay = false},  /* FRT_RADAR11 Bus 0 */ \
+  {0x420, scc_bus,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
+  {0x421, scc_bus,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
+  {0x389, scc_bus,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
 
 #define HYUNDAI_COMMON_RX_CHECKS(legacy)                                                                                                                                               \
   {.msg = {{0x260, 0, 8, .max_counter = 3U, .ignore_quality_flag = true, .frequency = 100U},                                                                                           \
@@ -309,8 +308,6 @@ static safety_config hyundai_init(uint16_t param) {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
-    {0x363, 0, 8, .check_relay = false},  /* RADAR_0X363 */ \
-    {0x398, 0, 8, .check_relay = false},  /* RADAR_0X398 */ \
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
