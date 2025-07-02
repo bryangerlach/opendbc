@@ -51,9 +51,9 @@ const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
 };
 
 const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
-  {0x50, 0, 16, .check_relay = false},
+  {0x50, 0, 16, .check_relay = true},
   {0x4F1, 1, 4, .check_relay = false},
-  {0x2A4, 0, 24, .check_relay = false},
+  {0x2A4, 0, 24, .check_relay = true},
   {0x51, 0, 32, .check_relay = false},
   {0x730, 1, 8, .check_relay = false},
   {0x340, 1, 8, .check_relay = false},
