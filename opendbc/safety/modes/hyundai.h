@@ -303,15 +303,14 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
     HYUNDAI_COMMON_TX_MSGS(0, true)
-    {0x420, 0,       8, .check_relay = true},   /* SCC11 Bus 0       */ \
-    {0x421, 0,       8, .check_relay = true},   /* SCC12 Bus 0       */ \
-    {0x389, 0,       8, .check_relay = true},   /* SCC14 Bus 0       */ \
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, true)
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
+    {0x363, 0, 8, .check_relay = false},  /* RADAR_0X363 */ \
+    {0x398, 0, 8, .check_relay = false},  /* RADAR_0X398 */ \
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
