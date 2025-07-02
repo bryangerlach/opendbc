@@ -32,7 +32,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 #define HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS() \
   {0x50, 0, 16, .check_relay = true}, \
-  {0x4F1, 1, 4, .check_relay = true}, \
+  {0x4F1, 1, 4, .check_relay = false}, \
   {0x2A4, 0, 24, .check_relay = true}, \
 
 #define HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS() \
@@ -98,7 +98,7 @@ RxCheck hyundai_can_canfd_blended_hda2_rx_checks[] = {
 
 RxCheck hyundai_can_canfd_blended_hda2_long_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
-  {.msg = {{0x4F1, 1, 4, .ignore_checksum = true, .max_counter = 15U, .frequency = 50U}, { 0 }, { 0 }}},
+  {.msg = {{0x4F1, 1, 4, .ignore_checksum = true, .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},
 };
 
 static bool hyundai_legacy = false;
