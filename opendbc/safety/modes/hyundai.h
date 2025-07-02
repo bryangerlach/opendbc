@@ -35,19 +35,6 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {0x4F1, 1, 4, .check_relay = true}, \
   {0x2A4, 0, 24, .check_relay = true}, \
 
-#define HYUNDAI_LONG_TX_MSGS() \
-  {0x340, 0, 8, .check_relay = false}, /* LKAS11 Bus 0 */ \
-  {0x4F1, 0, 4, .check_relay = false}, /* CLU11 Bus 0 */ \
-  {0x485, 0, 4, .check_relay = false}, /* LFAHDA_MFC Bus 0 */ \
-  {0x420, 0, 8, .check_relay = false}, /* SCC11 Bus 0 */ \
-  {0x421, 0, 8, .check_relay = false}, /* SCC12 Bus 0 */ \
-  {0x50A, 0, 8, .check_relay = false}, /* SCC13 Bus 0 */ \
-  {0x389, 0, 8, .check_relay = false}, /* SCC14 Bus 0 */ \
-  {0x4A2, 0, 2, .check_relay = false}, /* FRT_RADAR11 Bus 0 */ \
-  {0x38D, 0, 8, .check_relay = false}, /* FCA11 Bus 0 */ \
-  {0x483, 0, 8, .check_relay = false}, /* FCA12 Bus 0 */ \
-  {0x7D0, 0, 8, .check_relay = false}, /* radar UDS TX addr Bus 0 (for radar disable) */ \
-
 #define HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS() \
   {0x50, 0, 16, .check_relay = true}, \
   {0x4F1, 1, 4, .check_relay = false}, \
