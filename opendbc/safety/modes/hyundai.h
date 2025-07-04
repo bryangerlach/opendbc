@@ -38,15 +38,15 @@ static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
 
 static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = true},
+  {0x4F1, 1, 4, .check_relay = false},
   {0x2A4, 0, 24, .check_relay = true},
   {0x51, 0, 32, .check_relay = false},
   {0x730, 1, 8, .check_relay = false},
   {0x340, 1, 8, .check_relay = true},
   {0x485, 1, 8, .check_relay = true},
-  {0x420, 1, 8, .check_relay = false},
-  {0x421, 1, 8, .check_relay = false},
-  {0x389, 1, 8, .check_relay = false},
+  {0x420, 1, 8, .check_relay = true},
+  {0x421, 1, 8, .check_relay = true},
+  {0x389, 1, 8, .check_relay = true},
   {0x38D, 1, 8, .check_relay = false},
   {0x363, 1, 8, .check_relay = false},
   {0x398, 1, 8, .check_relay = false},
@@ -55,6 +55,7 @@ static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
   {0x39b, 1, 8, .check_relay = false},
   {0x39c, 1, 8, .check_relay = false},
   {0x43a, 1, 8, .check_relay = false},
+  {0x7D0, 0, 8, .check_relay = false},
 };
 
 
