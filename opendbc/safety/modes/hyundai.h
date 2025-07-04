@@ -38,7 +38,7 @@ static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
 
 static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = false},
+  {0x4F1, 1, 4, .check_relay = true},
   {0x2A4, 0, 24, .check_relay = true},
   {0x51, 0, 32, .check_relay = false},
   {0x730, 1, 8, .check_relay = false},
@@ -186,20 +186,14 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
 
   const int pt_bus = hyundai_can_canfd_blended ? 1 : 0;
-  const int scc_bus = hyundai_camera_scc ? 2 : hyundai_can_canfd_blended ? 1 : 0;
+  const int non_cam_scc_bus = hyundai_can_canfd_blended ? 1 : 0;
+  const int scc_bus = hyundai_camera_scc ? 2 : non_cam_scc_bus;
 
   // SCC12 is on bus 2 for camera-based SCC cars, bus 0 on all others
   if ((addr == 0x421) && (bus == scc_bus)) {
-    int cruise_engaged = (hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13)) & 0x3U;
+    uint8_t cruise_byte = hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13);
+    bool cruise_engaged = (cruise_byte & 0x3U) != 0U;
     hyundai_common_cruise_state_check(cruise_engaged);
-  }
-
-  if (addr == 0x420) {
-    if (((bus == 0) && !hyundai_camera_scc) || ((bus == 2) && hyundai_camera_scc)) {
-      if (!hyundai_longitudinal) {
-        acc_main_on = GET_BIT(to_push, 0U);
-      }
-    }
   }
 
   if (bus == pt_bus) {
@@ -207,10 +201,6 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
       int torque_driver_new = (GET_BYTES(to_push, 0, 2) & 0x7ffU) - 1024U;
       // update array of samples
       update_sample(&torque_driver, torque_driver_new);
-    }
-
-    if (addr == 0x391) {
-      mads_button_press = GET_BIT(to_push, 4U) ? MADS_BUTTON_PRESSED : MADS_BUTTON_NOT_PRESSED;
     }
 
     // ACC steering wheel buttons
@@ -225,8 +215,6 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
       gas_pressed = (((GET_BYTE(to_push, 4) & 0x7FU) << 1) | GET_BYTE(to_push, 3) >> 7) != 0U;
     } else if ((addr == 0x371) && hyundai_hybrid_gas_signal) {
       gas_pressed = GET_BYTE(to_push, 7) != 0U;
-    } else if ((addr == 0x91) && hyundai_fcev_gas_signal) {
-      gas_pressed = GET_BYTE(to_push, 6) != 0U;
     } else if ((addr == 0x260) && !hyundai_ev_gas_signal && !hyundai_hybrid_gas_signal) {
       gas_pressed = (GET_BYTE(to_push, 7) >> 6) != 0U;
     } else {
