@@ -3,12 +3,12 @@
 #include "opendbc/safety/safety_declarations.h"
 #include "opendbc/safety/modes/hyundai_common.h"
 
-#define HYUNDAI_LIMITS(steer, rate_up, rate_down) { \
+#define HYUNDAI_LIMITS(steer, rate_up, rate_down, drv_trq_allowance) { \
   .max_torque = (steer), \
   .max_rate_up = (rate_up), \
   .max_rate_down = (rate_down), \
   .max_rt_delta = 112, \
-  .driver_torque_allowance = 50, \
+  .driver_torque_allowance = drv_trq_allowance, \
   .driver_torque_multiplier = 2, \
   .type = TorqueDriverLimited, \
    /* the EPS faults when the steering angle is above a certain threshold for too long. to prevent this, */ \
@@ -32,7 +32,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = true},
+  {0x4F1, 1, 4, .check_relay = false},
   {0x2A4, 0, 24, .check_relay = true},
 };
 
@@ -44,9 +44,9 @@ static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
   {0x730, 1, 8, .check_relay = false},
   {0x340, 1, 8, .check_relay = true},
   {0x485, 1, 8, .check_relay = true},
-  {0x420, 1, 8, .check_relay = true},
-  {0x421, 1, 8, .check_relay = true},
-  {0x389, 1, 8, .check_relay = true},
+  {0x420, 1, 8, .check_relay = false},
+  {0x421, 1, 8, .check_relay = false},
+  {0x389, 1, 8, .check_relay = false},
   {0x38D, 1, 8, .check_relay = false},
   {0x363, 1, 8, .check_relay = false},
   {0x398, 1, 8, .check_relay = false},
@@ -248,9 +248,10 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
 }
 
 static bool hyundai_tx_hook(const CANPacket_t *to_send) {
-  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS = HYUNDAI_LIMITS(384, 3, 7);
-  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT = HYUNDAI_LIMITS(270, 2, 3);
-  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT_2 = HYUNDAI_LIMITS(170, 2, 3);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS = HYUNDAI_LIMITS(384, 3, 7, 50);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT = HYUNDAI_LIMITS(270, 2, 3, 50);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT_2 = HYUNDAI_LIMITS(170, 2, 3, 50);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED = HYUNDAI_LIMITS(384, 2, 3, 250);
 
   bool tx = true;
   int addr = GET_ADDR(to_send);
@@ -354,6 +355,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   hyundai_common_init(param);
   hyundai_legacy = false;
+  hyundai_can_canfd_blended = true;
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
