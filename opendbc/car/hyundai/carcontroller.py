@@ -108,7 +108,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       if self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, self.CAN.ECAN
       can_sends.append(make_tester_present_msg(addr, bus, suppress_response=True))
-      can_sends.append(make_tester_present_msg(addr, self.CAN.CAM, suppress_response=True))
 
       # for blinkers
       if self.CP.flags & HyundaiFlags.ENABLE_BLINKERS:
@@ -189,11 +188,11 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       #can_sends.append(hyundaican.create_lfahda_mfc(self.packer, CC.enabled, self.lfa_icon))
 
     # 5 Hz ACC options
-    if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl:
+    if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl and not can_canfd_blended:
       can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.CAN, self.ESCC))
 
     # 2 Hz front radar options
-    if self.frame % 50 == 0 and self.CP.openpilotLongitudinalControl and not self.ESCC.enabled:
+    if self.frame % 50 == 0 and self.CP.openpilotLongitudinalControl and not self.ESCC.enabled and not can_canfd_blended:
       can_sends.append(hyundaican.create_frt_radar_opt(self.packer, self.CAN))
 
     return can_sends
