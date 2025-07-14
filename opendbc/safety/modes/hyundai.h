@@ -8,7 +8,7 @@
   .max_rate_up = (rate_up), \
   .max_rate_down = (rate_down), \
   .max_rt_delta = 112, \
-  .driver_torque_allowance = drv_trq_allowance, \
+  .driver_torque_allowance = (drv_trq_allowance), \
   .driver_torque_multiplier = 2, \
   .type = TorqueDriverLimited, \
    /* the EPS faults when the steering angle is above a certain threshold for too long. to prevent this, */ \
@@ -71,7 +71,6 @@ static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
            {0x371, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 100U}, { 0 }}},                                                    \
   {.msg = {{0x386, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U :100U}, { 0 }, { 0 }}}, \
   {.msg = {{0x394, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}}, \
-  {.msg = {{0x4F1, (pt_bus), 4, .ignore_checksum = true, .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                                  \
 
 #define HYUNDAI_SCC11_ADDR_CHECK(scc_bus)                                                                                                         \
   {.msg = {{0x420, (scc_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
@@ -186,13 +185,11 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
   int addr = GET_ADDR(to_push);
 
   const int pt_bus = hyundai_can_canfd_blended ? 1 : 0;
-  const int non_cam_scc_bus = hyundai_can_canfd_blended ? 1 : 0;
-  const int scc_bus = hyundai_camera_scc ? 2 : non_cam_scc_bus;
+  const int scc_bus = hyundai_camera_scc ? 2 : hyundai_can_canfd_blended ? 1 : 0;
 
-  // SCC12 is on bus 2 for camera-based SCC cars, bus 0 on all others
+ // SCC12 is on bus 2 for camera-based SCC cars, bus 0 on all others
   if ((addr == 0x421) && (bus == scc_bus)) {
-    uint8_t cruise_byte = hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13);
-    bool cruise_engaged = (cruise_byte & 0x3U) != 0U;
+    int cruise_engaged = (hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13)) & 0x3U;
     hyundai_common_cruise_state_check(cruise_engaged);
   }
 
@@ -282,10 +279,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     int desired_torque = ((GET_BYTES(to_send, 0, 4) >> 16) & 0x7ffU) - 1024U;
     bool steer_req = GET_BIT(to_send, 27U);
 
-    const TorqueSteeringLimits limits = hyundai_alt_limits_2 ? HYUNDAI_STEERING_LIMITS_ALT_2 :
-                                        hyundai_alt_limits ? HYUNDAI_STEERING_LIMITS_ALT :
-                                        hyundai_can_canfd_blended ? HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED : HYUNDAI_STEERING_LIMITS;
-
+    const TorqueSteeringLimits limits = hyundai_alt_limits ? HYUNDAI_STEERING_LIMITS_ALT : HYUNDAI_STEERING_LIMITS;
     if (steer_torque_cmd_checks(desired_torque, steer_req, limits)) {
       tx = false;
     }
@@ -309,7 +303,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // BUTTONS: used for resume spamming and cruise cancellation
-  if ((addr == 0x4F1) && !hyundai_can_canfd_blended) {
+  if ((addr == 0x4F1) && !hyundai_longitudinal) {
     int button = GET_BYTE(to_send, 0) & 0x7U;
 
     bool allowed_resume = (button == 1) && controls_allowed;
@@ -318,8 +312,6 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
       tx = false;
     }
   }
-
-  tx = true;
 
   return tx;
 }
@@ -346,7 +338,6 @@ static safety_config hyundai_init(uint16_t param) {
 
   hyundai_common_init(param);
   hyundai_legacy = false;
-  hyundai_can_canfd_blended = true;
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
