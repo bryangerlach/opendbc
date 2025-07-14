@@ -32,7 +32,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 
 static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_TX_MSGS[] = {
   {0x50, 0, 16, .check_relay = true},
-  {0x4F1, 1, 4, .check_relay = false},
+  {0x4F1, 1, 4, .check_relay = true},
   {0x2A4, 0, 24, .check_relay = true},
 };
 
