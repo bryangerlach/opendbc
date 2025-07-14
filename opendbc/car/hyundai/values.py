@@ -76,7 +76,7 @@ class HyundaiSafetyFlags(IntFlag):
   CANFD_LKA_STEERING_ALT = 128
   FCEV_GAS = 256
   ALT_LIMITS_2 = 512
-  CAN_CANFD_BLENDED = 1024
+  CAN_CANFD_BLENDED = 2 ** 10
 
 
 class HyundaiFlags(IntFlag):
