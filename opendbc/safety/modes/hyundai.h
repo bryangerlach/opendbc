@@ -283,6 +283,8 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     }
   }
 
+  tx = true;
+
   return tx;
 }
 
