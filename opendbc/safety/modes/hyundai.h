@@ -266,7 +266,7 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
   }
 
   // UDS: Only tester present ("\x02\x3E\x80\x00\x00\x00\x00\x00") allowed on diagnostics address
-  if ((addr == 0x7D0) || (addr == 0x730) || (addr == 0x7B7)) {
+  if ((addr == 0x7D0) || (addr == 0x730)) {
     if ((GET_BYTES(to_send, 0, 4) != 0x00803E02U) || (GET_BYTES(to_send, 4, 4) != 0x0U)) {
       tx = false;
     }
@@ -313,11 +313,12 @@ static safety_config hyundai_init(uint16_t param) {
     {0x4F1, 0, 4, .check_relay = false},  /* CLU11 Bus 0 (radar-SCC) or 2 (camera-SCC) */
     {0x485, 0, 8, .check_relay = true},  /* LFAHDA_MFC Bus 0, dynamic message size    */
     {0x364, 0, 8, .check_relay = true}, /* ALERTS_364*/
-    {0x420, 2, 8, .check_relay = true},   /* SCC11 Bus 0       */
-    {0x421, 2, 8, .check_relay = true},   /* SCC12 Bus 0       */
-    {0x389, 2, 8, .check_relay = true},   /* SCC14 Bus 0       */
+    {0x420, 0, 8, .check_relay = false},   /* SCC11 Bus 0       */
+    {0x421, 0, 8, .check_relay = false},   /* SCC12 Bus 0       */
+    {0x389, 0, 8, .check_relay = false},   /* SCC14 Bus 0       */
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
+    {0x730, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
