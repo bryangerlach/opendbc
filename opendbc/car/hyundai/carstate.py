@@ -405,7 +405,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ("SAS11", 100),
     ]
 
-    if not CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CAMERA_SCC):
+    #if not CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CAMERA_SCC):
+    if not (CP.flags & HyundaiFlags.CAMERA_SCC):
       pt_messages += [
         ("SCC12", 50),
       ]
