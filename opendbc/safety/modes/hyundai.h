@@ -313,9 +313,9 @@ static safety_config hyundai_init(uint16_t param) {
     {0x4F1, 0, 4, .check_relay = false},  /* CLU11 Bus 0 (radar-SCC) or 2 (camera-SCC) */
     {0x485, 0, 8, .check_relay = true},  /* LFAHDA_MFC Bus 0, dynamic message size    */
     {0x364, 0, 8, .check_relay = true}, /* ALERTS_364*/
-    {0x420, 0, 8, .check_relay = true},   /* SCC11 Bus 0       */
-    {0x421, 0, 8, .check_relay = true},   /* SCC12 Bus 0       */
-    {0x389, 0, 8, .check_relay = true},   /* SCC14 Bus 0       */
+    {0x420, 2, 8, .check_relay = true},   /* SCC11 Bus 0       */
+    {0x421, 2, 8, .check_relay = true},   /* SCC12 Bus 0       */
+    {0x389, 2, 8, .check_relay = true},   /* SCC14 Bus 0       */
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
     {0x363, 0, 8, .check_relay = false},
