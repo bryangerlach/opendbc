@@ -107,7 +107,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       addr, bus = 0x7d0, self.CAN.ECAN if self.CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED) else 0
       if self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, self.CAN.ECAN
-      bus = self.CAN.ECAN
       can_sends.append(make_tester_present_msg(addr, bus, suppress_response=True))
 
       # for blinkers

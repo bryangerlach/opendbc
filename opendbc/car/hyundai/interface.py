@@ -202,9 +202,8 @@ class CarInterface(CarInterfaceBase):
       addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED) else 0
       if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, CanBus(CP).ECAN
-      bus = 4
-      addr = 0x7d0
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      for _ in range(10):
+        disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
     # for blinkers
     if CP.flags & HyundaiFlags.ENABLE_BLINKERS:
