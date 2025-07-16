@@ -242,7 +242,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }),
   ]
 
-  bus = CAN.ECAN
+  bus = CAN.CAM
 
   for addr, values in msg_values:
     values["COUNTER"] = idx % 0xF
