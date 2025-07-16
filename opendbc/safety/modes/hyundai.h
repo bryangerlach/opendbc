@@ -318,6 +318,8 @@ static safety_config hyundai_init(uint16_t param) {
     {0x389, 0, 8, .check_relay = false},   /* SCC14 Bus 0       */
     {0x38D, 0, 8, .check_relay = false}, // FCA11 Bus 0
     {0x7D0, 0, 8, .check_relay = false}, // radar UDS TX addr Bus 0 (for radar disable)
+    {0x363, 0, 8, .check_relay = false},
+    {0x398, 0, 8, .check_relay = false},
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
