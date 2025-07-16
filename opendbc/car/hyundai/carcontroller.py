@@ -113,12 +113,12 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
 
     # *** CAN/CAN FD specific ***
-    if self.CP.flags & HyundaiFlags.CANFD or (can_canfd_blended):
-      can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_torque, set_speed_in_units, accel,
+    # if self.CP.flags & HyundaiFlags.CANFD or (can_canfd_blended):
+    can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_torque, set_speed_in_units, accel,
                                               stopping, hud_control, actuators, CS, CC, can_canfd_blended, torque_fault))
-    else:
-      can_sends.extend(self.create_can_msgs(apply_steer_req, apply_torque, torque_fault, set_speed_in_units, accel,
-                                            stopping, hud_control, actuators, CS, CC))
+    # else:
+    #   can_sends.extend(self.create_can_msgs(apply_steer_req, apply_torque, torque_fault, set_speed_in_units, accel,
+    #                                         stopping, hud_control, actuators, CS, CC))
 
     new_actuators = actuators.as_builder()
     new_actuators.torque = apply_torque / self.params.STEER_MAX
