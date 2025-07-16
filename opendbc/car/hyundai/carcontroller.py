@@ -110,7 +110,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       if self.CP.flags & HyundaiFlags.ENABLE_BLINKERS:
         can_sends.append(make_tester_present_msg(0x7b1, self.CAN.ECAN, suppress_response=True))
 
-    can_canfd_blended = self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED
+    can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD or (can_canfd_blended):
