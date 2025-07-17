@@ -45,7 +45,7 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
   {.msg = {{0x386, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 15U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}}, \
   {.msg = {{0x394, (pt_bus), 8, .ignore_checksum = (legacy), .ignore_counter = (legacy), .max_counter = (legacy) ? 0U : 7U, .ignore_quality_flag = true, .frequency = (can_canfd_blended) ? 50U : 100U}, { 0 }, { 0 }}}, \
   {.msg = {{0x4F1, (pt_bus), 4, .ignore_checksum = true, .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                                  \
-  {.msg = {{0x251, (pt_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},                                              \
+  {.msg = {{0x251, (pt_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 100U}, { 0 }, { 0 }}},                                              \
 
 #define HYUNDAI_SCC11_ADDR_CHECK(scc_bus)                                                                                                         \
   {.msg = {{0x420, (scc_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
