@@ -45,11 +45,7 @@ class CarInterface(CarInterfaceBase):
         # this needs to be figured out for cars without an ADAS ECU
         ret.alphaLongitudinalAvailable = False
 
-      if not ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-        ret.enableBsm = 0x1e5 in fingerprint[CAN.ECAN]
-      else:
-        bus = CAN.ECAN if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
-        ret.enableBsm = 0x58b in fingerprint[bus]
+      ret.enableBsm = 0x1e5 in fingerprint[CAN.ECAN]
 
       # Check if the car is hybrid. Only HEV/PHEV cars have 0xFA on E-CAN.
       if 0xFA in fingerprint[CAN.ECAN]:
@@ -79,8 +75,6 @@ class CarInterface(CarInterfaceBase):
       if CAN.ECAN >= 4:
         cfgs.insert(0, get_safety_config(structs.CarParams.SafetyModel.noOutput))
       ret.safetyConfigs = cfgs
-      if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-        ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAN_CANFD_BLENDED.value
 
       if ret.flags & HyundaiFlags.CANFD_LKA_STEERING:
         ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CANFD_LKA_STEERING.value
@@ -94,7 +88,8 @@ class CarInterface(CarInterfaceBase):
     else:
       # Shared configuration for non CAN-FD cars
       ret.alphaLongitudinalAvailable = candidate not in UNSUPPORTED_LONGITUDINAL_CAR
-      ret.enableBsm = 0x58b in fingerprint[0]
+      bsm_bus = CAN.ECAN if ret.flags & HyundaiFlags.CAN_CANFD_HYBRID else 0
+      ret.enableBsm = 0x58b in fingerprint[bsm_bus]
 
       # Send LFA message on cars with HDA
       if 0x485 in fingerprint[2]:
@@ -108,10 +103,19 @@ class CarInterface(CarInterfaceBase):
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
         ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.hyundaiLegacy)]
       else:
-        ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.hyundai, 0)]
+        cfgs = [get_safety_config(structs.CarParams.SafetyModel.hyundai), ]
+        if CAN.ECAN >= 4:
+          cfgs.insert(0, get_safety_config(structs.CarParams.SafetyModel.noOutput))
+        ret.safetyConfigs = cfgs
 
       if ret.flags & HyundaiFlags.CAMERA_SCC:
         ret.safetyConfigs[0].safetyParam |= HyundaiSafetyFlags.CAMERA_SCC.value
+
+      if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+        ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAN_CANFD_BLENDED.value
+
+      if lka_steering:
+        ret.flags |= HyundaiFlags.CANFD_LKA_STEERING.value
 
       # These cars have the LFA button on the steering wheel
       if 0x391 in fingerprint[0]:
