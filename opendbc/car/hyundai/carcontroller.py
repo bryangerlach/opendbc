@@ -113,7 +113,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     can_canfd_blended = True
 
     # *** CAN/CAN FD specific ***
-    if self.CP.flags & HyundaiFlags.CANFD or (can_canfd_blended):
+    if self.CP.flags & HyundaiFlags.CANFD or can_canfd_blended:
       can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_torque, set_speed_in_units, accel,
                                               stopping, hud_control, actuators, CS, CC, can_canfd_blended, torque_fault))
     else:
