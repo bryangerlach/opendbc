@@ -70,7 +70,6 @@ RxCheck hyundai_rx_checks[] = {
 
 RxCheck hyundai_can_canfd_blended_hda2_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
-  HYUNDAI_SCC12_ADDR_CHECK(true, 1)
 };
 
 RxCheck hyundai_can_canfd_blended_hda2_long_rx_checks[] = {
@@ -304,8 +303,6 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
       tx = false;
     }
   }
-
-  tx = true;
 
   return tx;
 }
