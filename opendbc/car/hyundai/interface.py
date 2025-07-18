@@ -1,3 +1,4 @@
+import time
 from opendbc.car import Bus, get_safety_config, structs
 from opendbc.car.hyundai.hyundaicanfd import CanBus
 from opendbc.car.hyundai.values import HyundaiFlags, CAR, DBC, \
@@ -199,10 +200,23 @@ class CarInterface(CarInterfaceBase):
   def init(CP, CP_SP, can_recv, can_send):
     if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
-      addr, bus = 0x7d0, CanBus(CP).ECAN if (CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED)) else 0
+
+      bus = CanBus(CP).ECAN
+      addr = 0x7d0
+
+      # If steering is LKA style, radar is on different address (0x730)
       if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
-        addr, bus = 0x730, CanBus(CP).ECAN
-      addr, bus = 0x7d0, 4
+        addr = 0x730
+
+      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      time.sleep(0.1)
+      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+
+      bus = CanBus(CP).CAM
+      addr = 0x7d0
+
+      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      time.sleep(0.1)
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
 

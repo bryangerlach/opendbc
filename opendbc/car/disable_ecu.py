@@ -25,12 +25,12 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
         query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
         query.get_data(0)
 
-        carlog.error("ecu disabled")
+        carlog.error(f"ecu disabled on bus {bus}")
         return True
 
     except Exception:
       carlog.exception("ecu disable exception")
 
-    carlog.error(f"ecu disable retry ({i + 1}) ...")
-  carlog.error("ecu disable failed")
+    carlog.error(f"ecu disable retry ({i + 1}) ...bus {bus}")
+  carlog.error(f"ecu disable failed bus {bus}")
   return False
