@@ -209,15 +209,20 @@ class CarInterface(CarInterfaceBase):
         addr = 0x730
 
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
-      time.sleep(0.1)
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
-
+      time.sleep(0.5)
+      success = disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      if not success:
+        time.sleep(0.5)
+        disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
       bus = CanBus(CP).CAM
       addr = 0x7d0
 
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
-      time.sleep(0.1)
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      time.sleep(0.5)
+      success = disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      if not success:
+        time.sleep(0.5)
+        disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
 
     # for blinkers

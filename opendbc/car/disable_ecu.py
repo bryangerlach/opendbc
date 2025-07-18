@@ -19,11 +19,14 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
     try:
       query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
 
-      for _, _ in query.get_data(timeout).items():
-        carlog.warning("communication control disable tx/rx ...")
+      results = query.get_data(timeout)
+      for (rx_addr, _), data in results.items():
+        carlog.error(f"Received EXT_DIAG_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
 
         query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
-        query.get_data(0)
+        results = query.get_data(0)
+        for (rx_addr, _), data in results.items():
+          carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
 
         carlog.error(f"ecu disabled on bus {bus}")
         return True
