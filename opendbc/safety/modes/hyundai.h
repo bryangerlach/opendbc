@@ -50,8 +50,8 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 #define HYUNDAI_SCC11_ADDR_CHECK(scc_bus)                                                                                                         \
   {.msg = {{0x420, (scc_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
 
-#define HYUNDAI_SCC12_ADDR_CHECK(can_canfd_blended, scc_bus)                                                                            \
-  {.msg = {{0x421, (scc_bus), 8, .ignore_checksum = (can_canfd_blended), .max_counter = 15U, .frequency = 50U}, { 0 }, { 0 }}}, \
+#define HYUNDAI_SCC12_ADDR_CHECK(can_canfd_blended, scc_bus)                                                                     \
+  {.msg = {{0x421, (scc_bus), 8, .ignore_checksum = (can_canfd_blended), .max_counter = 15U, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}},  \
 
 #define HYUNDAI_FCEV_GAS_ADDR_CHECK \
   {.msg = {{0x91,  0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 100U}, { 0 }, { 0 }}}, \
@@ -70,6 +70,7 @@ RxCheck hyundai_rx_checks[] = {
 
 RxCheck hyundai_can_canfd_blended_hda2_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
+  HYUNDAI_SCC12_ADDR_CHECK(true, 1)
 };
 
 RxCheck hyundai_can_canfd_blended_hda2_long_rx_checks[] = {
@@ -162,15 +163,15 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
   const int scc_bus = hyundai_camera_scc ? 2 : hyundai_can_canfd_blended ? 1 : 0;
 
  // SCC12 is on bus 2 for camera-based SCC cars, bus 0 on all others
-  // if ((addr == 0x421) && (bus == scc_bus)) {
-  //   uint8_t cruise_byte = hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13);
-  //   bool cruise_engaged = (cruise_byte & 0x3U) != 0U;
-  //   hyundai_common_cruise_state_check(cruise_engaged);
-  // }
+  if ((addr == 0x421) && (bus == scc_bus)) {
+    uint8_t cruise_byte = hyundai_can_canfd_blended ? (GET_BYTE(to_push, 3) >> 4) : (GET_BYTES(to_push, 0, 4) >> 13);
+    bool cruise_engaged = (cruise_byte & 0x3U) != 0U;
+    hyundai_common_cruise_state_check(cruise_engaged);
+  }
 
-  if ((addr == 0x420) && (bus == scc_bus)) {
+  if ((addr == 0x421) && (bus == scc_bus)) {
     if (!hyundai_longitudinal) {
-      acc_main_on = GET_BIT(to_push, 0U);
+      acc_main_on = GET_BIT(to_push, 27);
     }
   }
 
@@ -238,8 +239,8 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     }
   }
 
-  if (addr == 0x420) {
-    acc_main_on_tx = GET_BIT(to_send, 0U);
+  if (addr == 0x421) {
+    acc_main_on_tx = GET_BIT(to_send, 27);
     hyundai_common_acc_main_on_sync();
   }
 
