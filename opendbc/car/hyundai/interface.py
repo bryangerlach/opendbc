@@ -212,7 +212,7 @@ class CarInterface(CarInterfaceBase):
       time.sleep(0.5)
       success = disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
       if not success:
-        time.sleep(0.5)
+        time.sleep(3)
         disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
       bus = CanBus(CP).CAM
       addr = 0x7d0
@@ -221,7 +221,7 @@ class CarInterface(CarInterfaceBase):
       time.sleep(0.5)
       success = disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
       if not success:
-        time.sleep(0.5)
+        time.sleep(3)
         disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
 
