@@ -381,7 +381,7 @@ def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
 
 def create_frt_radar_opt(packer, CAN):
   frt_radar11_values = {
-    "CF_FCA_Equip_Front_Radar": 1,
+    "CF_FCA_Equip_Front_Radar": 7,
   }
   return packer.make_can_msg("FRT_RADAR11", CAN.ECAN, frt_radar11_values)
 
