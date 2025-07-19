@@ -154,9 +154,14 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
       bool cruise_engaged = (cruise_byte & 0x3U) != 0U;
       hyundai_common_cruise_state_check(cruise_engaged);
     }
+    if (hyundai_can_canfd_blended) {
+      if (!hyundai_longitudinal) {
+        acc_main_on = GET_BIT(to_push, 27);
+      }
+    }
   }
 
-  if (addr == 0x420) {
+  if (addr == 0x420 && !hyundai_can_canfd_blended) {
     if (((bus == 0) && !hyundai_camera_scc) || ((bus == 2) && hyundai_camera_scc)) {
       if (!hyundai_longitudinal) {
         acc_main_on = GET_BIT(to_push, 0U);
