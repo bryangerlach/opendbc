@@ -109,7 +109,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
         addr, bus = 0x730, self.CAN.ECAN
       addr, bus = 0x7d0, self.CAN.ECAN
       can_sends.append(make_tester_present_msg(addr, bus, suppress_response=True))
-      addr, bus = 0x7d0, self.CAN.CAM
+      addr, bus = 0x730, self.CAN.CAM
       can_sends.append(make_tester_present_msg(addr, bus, suppress_response=True))
 
       # for blinkers

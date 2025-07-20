@@ -204,9 +204,11 @@ class CarInterface(CarInterfaceBase):
       bus = CanBus(CP).ECAN
       addr = 0x7d0
 
-      # If steering is LKA style, radar is on different address (0x730)
-      if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
-        addr = 0x730
+      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+
+      bus = CanBus(CP).ECAN
+      addr = 0x730
 
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
