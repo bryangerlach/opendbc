@@ -209,6 +209,11 @@ class CarInterface(CarInterfaceBase):
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
+      bus = CanBus(CP).CAM
+      addr = 0x7d0
+      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+
     # for blinkers
     if CP.flags & HyundaiFlags.ENABLE_BLINKERS:
       disable_ecu(can_recv, can_send, bus=CanBus(CP).ECAN, addr=0x7B1, com_cont_req=b'\x28\x83\x01')
