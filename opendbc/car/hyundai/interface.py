@@ -201,23 +201,12 @@ class CarInterface(CarInterfaceBase):
     if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
 
-      bus = CanBus(CP).ECAN
-      addr = 0x7d0
-      time.sleep(5)
-      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
+      if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
+        addr, bus = 0x730, CanBus(CP).ECAN
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
-      time.sleep(0.05)
-      bus = CanBus(CP).CAM
-      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
-
-      bus = CanBus(CP).ECAN
-      time.sleep(1)
-      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
-      time.sleep(0.05)
-      bus = CanBus(CP).CAM
-      print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
+      time.sleep(.1)
+      addr = 0x7d4
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
     # for blinkers
