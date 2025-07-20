@@ -206,6 +206,7 @@ class CarInterface(CarInterfaceBase):
       time.sleep(5)
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      time.sleep(0.05)
       bus = CanBus(CP).CAM
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
@@ -214,6 +215,7 @@ class CarInterface(CarInterfaceBase):
       time.sleep(1)
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
+      time.sleep(0.05)
       bus = CanBus(CP).CAM
       print(f"Disabling radar on bus {bus}, addr 0x{addr:X}")
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
