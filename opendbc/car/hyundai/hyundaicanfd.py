@@ -38,7 +38,7 @@ class CanBus(CanBusBase):
 
 def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
                             frame, torque_fault, left_lane, right_lane,
-                            left_lane_depart, right_lane_depart, lkas_icon):
+                            left_lane_depart, right_lane_depart, lkas_icon, msg_364):
   common_values = {
     "LKA_MODE": 2,
     "LKA_ICON": lkas_icon,
@@ -70,6 +70,15 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     ret.append(packer.make_can_msg(lkas_msg, CAN.ACAN, lkas_values))
   else:
     ret.append(packer.make_can_msg("LFA", CAN.ECAN, lfa_values))
+
+  if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+    if msg_364["ALERT_1"] == 5:
+      msg_364["ALERT_1"] = 0
+
+    msg_364["COUNTER"] = frame % 0xF
+    dat = packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364)[1]
+    checksum = hyundai_checksum(dat[1:8])
+    msg_364["CHECKSUM"] = checksum
 
   return ret
 
