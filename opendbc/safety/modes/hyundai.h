@@ -292,10 +292,10 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
 }
 
 bool hyundai_fwd_hook(int bus_num, int addr) {
-  if ((bus_num == 4 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
+  if ((bus_num == 0 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
     return false;  // Block radar SCC messages
   }
-  if ((bus_num == 6 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
+  if ((bus_num == 2 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
     return false;  // Block radar SCC messages
   }
   return true;  // Forward all else from bus 4 to 132
