@@ -4,8 +4,8 @@ from opendbc.car.isotp_parallel_query import IsoTpParallelQuery
 EXT_DIAG_REQUEST = b'\x10\x03'
 EXT_DIAG_RESPONSE = b'\x50\x03'
 
-SOFT_RESET_REQUEST = b'\x11\x01'
-SOFT_RESET_RESPONSE = b''  # Most ECUs either ACK with nothing or reset immediately
+RESET_REQUEST = b'\x11\x01'
+RESET_RESPONSE = b''
 
 COM_CONT_RESPONSE = b''
 
@@ -20,12 +20,12 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
 
   for i in range(retry):
     try:
-      # Send soft reset first (optional, but may help clean ECU state)
-      carlog.error("sending soft reset (0x11 0x03) ...")
-      reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [SOFT_RESET_REQUEST], [SOFT_RESET_RESPONSE])
+      # Send reset first because the disable request below is not getting to the radar soon enough
+      carlog.error("sending reset (0x11 0x01) ...")
+      reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [RESET_REQUEST], [RESET_RESPONSE])
       reset_query.get_data(timeout=0.1)
     except Exception:
-      carlog.error("soft reset failed or unsupported")
+      carlog.error("reset failed or unsupported")
 
     try:
       query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
