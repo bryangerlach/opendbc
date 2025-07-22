@@ -80,6 +80,8 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     checksum = hyundai_checksum(dat[1:8])
     msg_364["CHECKSUM"] = checksum
 
+  ret.append(packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364))
+
   return ret
 
 def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
