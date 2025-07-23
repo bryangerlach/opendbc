@@ -71,6 +71,9 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
   else:
     ret.append(packer.make_can_msg("LFA", CAN.ECAN, lfa_values))
 
+  return ret
+
+def create_suppress_daw(packer, msg_364, frame, CAN, CP):
   if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
     if msg_364["ALERT_1"] == 5:
       msg_364["ALERT_1"] = 0
@@ -80,9 +83,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     checksum = hyundai_checksum(dat[1:8])
     msg_364["CHECKSUM"] = checksum
 
-  ret.append(packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364))
-
-  return ret
+    return packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364)
 
 def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
   suppress_msg = "CAM_0x362" if lka_steering_alt else "CAM_0x2a4"
