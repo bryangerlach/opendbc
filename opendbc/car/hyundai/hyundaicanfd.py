@@ -38,7 +38,7 @@ class CanBus(CanBusBase):
 
 def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
                             frame, torque_fault, left_lane, right_lane,
-                            left_lane_depart, right_lane_depart, lkas_icon, msg_364):
+                            left_lane_depart, right_lane_depart, lkas_icon):
   common_values = {
     "LKA_MODE": 2,
     "LKA_ICON": lkas_icon,
