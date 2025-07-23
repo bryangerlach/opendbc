@@ -20,11 +20,10 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
   WARNING: THIS DISABLES AEB!"""
 
   def confirm_radar_silent():
-    # Replace these with your platform’s radar message IDs
     radar_msgs = [0x420, 0x421, 0x389]
     start_time = time.monotonic()
     while time.monotonic() - start_time < CONFIRM_TIMEOUT:
-      msg = can_recv.get_message()
+      msg = can_recv()
       if msg and msg[0] == bus and msg[1] in radar_msgs:
         carlog.error(f"Radar still sending {hex(msg[1])} on bus {bus}")
         return False
