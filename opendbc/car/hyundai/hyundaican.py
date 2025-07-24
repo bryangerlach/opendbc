@@ -220,10 +220,10 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }),
 
     ("SCC12", {
-      "MainMode_ACC": 1,
+      "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
-      "VSetDis": set_speed,
+      "VSetDis": set_speed if enabled else 0,
       "ACC_ObjDist": 1,
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if stopping else 0,
