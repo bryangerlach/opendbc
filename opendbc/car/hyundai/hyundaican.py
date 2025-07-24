@@ -231,7 +231,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
     ("SCC14", {
       "ACC_ObjLatPos": 0,
-      "ObjValid": 0,
+      "ObjValid": 1,
       "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
     }),
 
