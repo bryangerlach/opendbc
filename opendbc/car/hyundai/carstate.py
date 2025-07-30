@@ -148,7 +148,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     # Consider Taking a Break message
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.msg_364 = copy.copy(cp_cam.vl["ALERTS_364"])
-      self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
+      self.dawStatus = cp_cam.vl["ALERTS_364"]["DAW_Status"]
 
     # TODO: Find brake pressure
     ret.brake = 0
