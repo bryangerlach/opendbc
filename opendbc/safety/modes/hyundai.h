@@ -235,7 +235,7 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
                                                             ((msg->data[5] << 3) | (msg->data[4] >> 5)) - 1023U;
 
     int aeb_decel_cmd = hyundai_can_canfd_blended ? 0 : msg->data[2];
-    bool aeb_req = hyundai_can_canfd_blended ? 0 : msg->data[54];
+    bool aeb_req = hyundai_can_canfd_blended ? 0 : GET_BIT(msg, 54U);
 
     acc_main_on_tx = hyundai_can_canfd_blended ? msg->data[27] : msg->data[0];
     hyundai_common_acc_main_on_sync();
