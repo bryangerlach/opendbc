@@ -192,9 +192,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
                                                            hud_control.leftLaneVisible, hud_control.rightLaneVisible,
                                                            left_lane_warning, right_lane_warning, self.lkas_icon))
 
-    # block consider taking a break warning
-    if self.frame % 2 == 0 and can_canfd_blended and CS.msg_364["ALERT_1"] == 5:
-      can_sends.append(hyundaicanfd.create_suppress_daw(self.packer, CS.msg_364, self.frame, self.CAN, self.CP))
 
     # prevent LFA from activating on LKA steering cars by sending "no lane lines detected" to ADAS ECU
     if self.frame % 5 == 0 and lka_steering:
