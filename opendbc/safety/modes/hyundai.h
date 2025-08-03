@@ -273,7 +273,7 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
 
   // CAN CAN-FD Hybrid steering
   if (msg->addr == 0x50U) {
-    int desired_torque = ((msg->data[6] & 0xFU << 7U) | (msg->data[5] >> 1U)) - 1024U;
+    int desired_torque = (((msg->data[6] & 0xFU) << 7U) | (msg->data[5] >> 1U)) - 1024U;
     bool steer_req = GET_BIT(msg, 52U);
 
     if (steer_torque_cmd_checks(desired_torque, steer_req, HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED)) {
