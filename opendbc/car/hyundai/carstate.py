@@ -149,7 +149,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     ret.accFaulted = cp.vl["TCS13"]["ACCEnable"] != 0  # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
 
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      ret.dawStatus = cp.v1["ALERTS_364"]["DAW_Status"]
+      ret.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
     else:
       ret.dawStatus = 6
 
