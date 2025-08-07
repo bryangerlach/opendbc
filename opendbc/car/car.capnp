@@ -114,8 +114,6 @@ struct OnroadEventDEPRECATED @0x9b1657f34caf3ad3 {
     espActive @121;
     personalityChanged @122;
     aeb @123;
-    dawLevel2 @124;
-    dawLevel1 @125;
 
     radarCanErrorDEPRECATED @15;
     communityFeatureDisallowedDEPRECATED @62;
@@ -177,6 +175,8 @@ struct CarState {
   wheelSpeeds @2 :WheelSpeeds;
 
   dawStatus @61 :UInt8;
+  dawLevel2 @62;
+  dawLevel1 @63;
 
   gasPressed @4 :Bool;    # this is user pedal only
 
