@@ -262,8 +262,10 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
 
     violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
     violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
-    violation |= (aeb_decel_cmd != 0);
-    violation |= aeb_req;
+    if (!hyundai_escc) {
+      violation |= (aeb_decel_cmd != 0);
+      violation |= aeb_req;
+    }
 
     if (violation) {
       tx = false;
@@ -282,7 +284,7 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
   }
 
   // CAN CAN-FD Hybrid steering
-  if (msg->addr == 0x50U) {
+  if (msg->addr == 0x50U && hyundai_can_canfd_blended) {
     int desired_torque = (((msg->data[6] & 0xFU) << 7U) | (msg->data[5] >> 1U)) - 1024U;
     bool steer_req = GET_BIT(msg, 52U);
 
