@@ -60,9 +60,6 @@ class CarControllerParams:
     # Default for most HKG
     else:
       self.STEER_MAX = 384
-      self.STEER_MAX = 330 if CP.flags & HyundaiFlags.ALT_LIMITS else 384
-      self.STEER_DELTA_UP = 2 if CP.flags & HyundaiFlags.ALT_LIMITS else 3
-      self.STEER_DELTA_DOWN = 3 if CP.flags & HyundaiFlags.ALT_LIMITS else 7
 
 
 class HyundaiSafetyFlags(IntFlag):
