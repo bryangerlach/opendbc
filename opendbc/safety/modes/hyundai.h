@@ -168,11 +168,18 @@ static void hyundai_rx_hook(const CANPacket_t *to_push) {
     hyundai_common_cruise_state_check(cruise_engaged);
   }
 
-  if ((addr == 0x421) && (bus == scc_bus)) {
+  if ((addr == 0x421) && (bus == scc_bus) && hyundai_can_canfd_blended) {
     if (!hyundai_longitudinal) {
       acc_main_on = GET_BIT(to_push, 27);
     }
   }
+
+  if ((addr == 0x420) && (bus == scc_bus) && !hyundai_can_canfd_blended) {
+    if (!hyundai_longitudinal) {
+      acc_main_on = GET_BIT(to_push, 0);
+    }
+  }
+
 
   if (bus == pt_bus) {
     if (addr == 0x251) {
@@ -238,8 +245,13 @@ static bool hyundai_tx_hook(const CANPacket_t *to_send) {
     }
   }
 
-  if (addr == 0x421) {
+  if (addr == 0x421 && hyundai_can_canfd_blended) {
     acc_main_on_tx = GET_BIT(to_send, 27);
+    hyundai_common_acc_main_on_sync();
+  }
+
+  if (addr == 0x421 && !hyundai_can_canfd_blended) {
+    acc_main_on_tx = GET_BIT(to_send, 0);
     hyundai_common_acc_main_on_sync();
   }
 
