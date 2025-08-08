@@ -73,19 +73,6 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
 
   return ret
 
-def create_suppress_daw(packer, msg_364, frame, CAN, CP):
-  if msg_364["DAW_Warning"] == 1:
-    msg_364["DAW_Warning"] = 0
-  if msg_364["DAW_Status"] < 5:
-    msg_364["DAW_Status"] = 5
-
-  msg_364["COUNTER"] = frame % 0xF
-  dat = packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364)[1]
-  checksum = hyundai_checksum(dat[1:8])
-  msg_364["CHECKSUM"] = checksum
-
-  return packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364)
-
 def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
   suppress_msg = "CAM_0x362" if lka_steering_alt else "CAM_0x2a4"
   msg_bytes = 32 if lka_steering_alt else 24
@@ -96,10 +83,6 @@ def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
   values["SET_ME_0_2"] = 0
   values["LEFT_LANE_LINE"] = 0
   values["RIGHT_LANE_LINE"] = 0
-  values["BYTE10"] = 0
-  values["BYTE11"] = 0
-  values["BYTE12"] = 0
-  values["BYTE13"] = 0
   return packer.make_can_msg(suppress_msg, CAN.ACAN, values)
 
 def create_lkas11_can_canfd_blended(packer, CAN, frame, apply_steer, steer_req,
