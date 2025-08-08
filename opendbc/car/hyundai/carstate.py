@@ -63,6 +63,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     self.buttons_counter = 0
 
     self.cruise_info = {}
+    self.dawStatus = 5
 
     # On some cars, CLU15->CF_Clu_VehicleSpeed can oscillate faster than the dash updates. Sample at 5 Hz
     self.cluster_speed = 0
@@ -150,8 +151,10 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       ret.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
+      self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
     else:
       ret.dawStatus = 6
+      self.dawStatus = 6
 
     if self.CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV | HyundaiFlags.FCEV):
       if self.CP.flags & HyundaiFlags.FCEV:
