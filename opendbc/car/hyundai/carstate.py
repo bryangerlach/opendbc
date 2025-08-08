@@ -401,9 +401,16 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ("SAS11", 100),
     ]
 
-    if not CP.openpilotLongitudinalControl:
+    if not CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CAMERA_SCC):
       if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
         pt_messages.append(("SCC12", 50))
+      else:
+        pt_messages += [
+          ("SCC11", 50),
+          ("SCC12", 50),
+        ]
+        if CP.flags & HyundaiFlags.USE_FCA.value:
+          pt_messages.append(("FCA11", 50))
 
     if CP.enableBsm:
       pt_messages.append(("LCA11", 20 if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 50))
