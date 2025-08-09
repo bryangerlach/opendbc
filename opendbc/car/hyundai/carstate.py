@@ -153,8 +153,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ret.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
       self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
     else:
-      ret.dawStatus = 6
-      self.dawStatus = 6
+      ret.dawStatus = 5
+      self.dawStatus = 5
 
     if self.CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV | HyundaiFlags.FCEV):
       if self.CP.flags & HyundaiFlags.FCEV:
@@ -345,6 +345,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       return self.get_can_parsers_canfd(CP)
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).ECAN if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).CAM if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 2),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).ECAN),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).CAM),
     }
