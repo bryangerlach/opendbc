@@ -181,7 +181,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
     ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(gear))
 
-    if (not self.CP.openpilotLongitudinalControl or self.CP.flags & HyundaiFlags.CAMERA_SCC) and not (self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED):
+    if (not self.CP.openpilotLongitudinalControl or self.CP.flags & HyundaiFlags.CAMERA_SCC) and not self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       aeb_src = "FCA11" if self.CP.flags & HyundaiFlags.USE_FCA.value else "SCC12"
       aeb_sig = "FCA_CmdAct" if self.CP.flags & HyundaiFlags.USE_FCA.value else "AEB_CmdAct"
       aeb_warning = cp_cruise.vl[aeb_src]["CF_VSM_Warn"] != 0
@@ -195,11 +195,11 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ret.rightBlindspot = cp.vl["LCA11"]["CF_Lca_IndRight"] != 0
 
     # save the entire LKAS11 and CLU11
-    if not self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
-    self.clu11 = copy.copy(cp.vl["CLU11"])
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.lfa_block_msg = copy.copy(cp_cam.vl["CAM_0x2a4"])
+    else:
+      self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
+    self.clu11 = copy.copy(cp.vl["CLU11"])
     self.steer_state = cp.vl["MDPS12"]["CF_Mdps_ToiActive"]  # 0 NOT ACTIVE, 1 ACTIVE
     prev_cruise_buttons = self.cruise_buttons[-1]
     prev_main_buttons = self.main_buttons[-1]
@@ -345,6 +345,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       return self.get_can_parsers_canfd(CP)
 
     return {
-      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).ECAN),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).CAM),
+      Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).ECAN if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], CanBus(CP).CAM if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 2),
     }
