@@ -6,6 +6,7 @@ from opendbc.sunnypilot.car.hyundai.escc import EnhancedSmartCruiseControl
 
 hyundai_checksum = crcmod.mkCrcFun(0x11D, initCrc=0xFD, rev=False, xorOut=0xdf)
 
+
 def create_lkas11(packer, frame, CP, apply_torque, steer_req,
                   torque_fault, lkas11, sys_warning, sys_state, enabled,
                   left_lane, right_lane,
@@ -251,6 +252,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     commands.append(packer.make_can_msg(addr, bus, values))
 
   return commands
+
 
 
 def create_acc_commands(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
