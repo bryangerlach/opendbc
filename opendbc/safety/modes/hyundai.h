@@ -153,8 +153,8 @@ static uint32_t hyundai_compute_checksum(const CANPacket_t *msg) {
 
 static void hyundai_rx_hook(const CANPacket_t *msg) {
 
-  const int pt_bus = hyundai_can_canfd_blended ? 1 : 0;
-  const int scc_bus = hyundai_camera_scc ? 2 : hyundai_can_canfd_blended ? 1 : 0;
+  const unsigned int pt_bus = hyundai_can_canfd_blended ? 1U : 0U;
+  const unsigned int scc_bus = hyundai_camera_scc ? 2U : hyundai_can_canfd_blended ? 1U : 0U;
 
  // SCC12 is on bus 2 for camera-based SCC cars, bus 0 on all others
   if ((msg->addr == 0x421U) && (msg->bus == scc_bus)) {
@@ -165,13 +165,13 @@ static void hyundai_rx_hook(const CANPacket_t *msg) {
 
   if ((msg->addr == 0x421U) && (msg->bus == scc_bus)  && hyundai_can_canfd_blended) {
     if (!hyundai_longitudinal) {
-      acc_main_on = GET_BIT(msg, 27);
+      acc_main_on = GET_BIT(msg, 27U);
     }
   }
 
   if ((msg->addr == 0x420U) && (msg->bus == scc_bus)  && !hyundai_can_canfd_blended) {
     if (!hyundai_longitudinal) {
-      acc_main_on = GET_BIT(msg, 0);
+      acc_main_on = GET_BIT(msg, 0U);
     }
   }
 
@@ -223,6 +223,7 @@ static void hyundai_rx_hook(const CANPacket_t *msg) {
 static bool hyundai_tx_hook(const CANPacket_t *msg) {
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS = HYUNDAI_LIMITS(384, 3, 7, 50);
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT = HYUNDAI_LIMITS(270, 2, 3, 50);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT_2 = HYUNDAI_LIMITS(170, 2, 3, 50);
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED = HYUNDAI_LIMITS(384, 2, 3, 250);
 
   bool tx = true;
@@ -277,7 +278,9 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
     int desired_torque = ((GET_BYTES(msg, 0, 4) >> 16) & 0x7ffU) - 1024U;
     bool steer_req = GET_BIT(msg, 27U);
 
-    const TorqueSteeringLimits limits = hyundai_alt_limits ? HYUNDAI_STEERING_LIMITS_ALT : HYUNDAI_STEERING_LIMITS;
+    const TorqueSteeringLimits limits = hyundai_alt_limits_2 ? HYUNDAI_STEERING_LIMITS_ALT_2 :
+                                        hyundai_alt_limits ? HYUNDAI_STEERING_LIMITS_ALT : HYUNDAI_STEERING_LIMITS;
+
     if (steer_torque_cmd_checks(desired_torque, steer_req, limits)) {
       tx = false;
     }

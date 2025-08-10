@@ -149,12 +149,12 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     ret.espActive = cp.vl["TCS11"]["ABS_ACT"] == 1
     ret.accFaulted = cp.vl["TCS13"]["ACCEnable"] != 0  # 0 ACC CONTROL ENABLED, 1-3 ACC CONTROL DISABLED
 
-    # if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-    #   ret.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
-    #   self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
-    # else:
-    #   ret.dawStatus = 5
-    #   self.dawStatus = 5
+    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      ret.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
+      self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
+    else:
+      ret.dawStatus = 6
+      self.dawStatus = 6
 
     if self.CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV | HyundaiFlags.FCEV):
       if self.CP.flags & HyundaiFlags.FCEV:

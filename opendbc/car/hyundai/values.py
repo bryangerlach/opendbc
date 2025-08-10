@@ -24,7 +24,7 @@ class CarControllerParams:
     self.STEER_THRESHOLD = 150
     self.STEER_STEP = 1  # 100 Hz
 
-    if CP.flags & HyundaiFlags.CANFD and not (CP.flags & HyundaiFlags.CAN_CANFD_BLENDED):
+    if CP.flags & HyundaiFlags.CANFD:
       self.STEER_MAX = 270
       self.STEER_DRIVER_ALLOWANCE = 250
       self.STEER_DRIVER_MULTIPLIER = 2
