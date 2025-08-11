@@ -46,9 +46,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     "TORQUE_REQUEST": apply_torque,
     "LKA_ASSIST": 0,
     "STEER_REQ": 1 if lat_active else 0,
-    "STEER_MODE": 0,
     "HAS_LANE_SAFETY": 0,  # hide LKAS settings
-    "NEW_SIGNAL_2": 0,
     "DAMP_FACTOR": 100,  # can potentially tuned for better perf [3, 200]
   }
 
@@ -80,7 +78,7 @@ def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
   suppress_msg = "CAM_0x362" if lka_steering_alt else "CAM_0x2a4"
   msg_bytes = 32 if lka_steering_alt else 24
 
-  values = {f"BYTE{i}": lfa_block_msg[f"BYTE{i}"] for i in range(3, msg_bytes) if i not in {7, 10, 11, 12, 13}}
+  values = {f"BYTE{i}": lfa_block_msg[f"BYTE{i}"] for i in range(3, msg_bytes) if i != 7}
   values["COUNTER"] = lfa_block_msg["COUNTER"]
   values["SET_ME_0"] = 0
   values["SET_ME_0_2"] = 0

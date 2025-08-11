@@ -103,7 +103,7 @@ class CarInterface(CarInterfaceBase):
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
         ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.hyundaiLegacy)]
       else:
-        cfgs = [get_safety_config(structs.CarParams.SafetyModel.hyundai), ]
+        cfgs = [get_safety_config(structs.CarParams.SafetyModel.hyundai, 0)]
         if CAN.ECAN >= 4:
           cfgs.insert(0, get_safety_config(structs.CarParams.SafetyModel.noOutput))
         ret.safetyConfigs = cfgs
@@ -118,7 +118,7 @@ class CarInterface(CarInterfaceBase):
         ret.flags |= HyundaiFlags.CANFD_LKA_STEERING.value
 
       # These cars have the LFA button on the steering wheel
-      if 0x391 in fingerprint[0]:
+      if 0x391 in fingerprint[0] or ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
         ret.flags |= HyundaiFlags.HAS_LDA_BUTTON.value
 
     # Common lateral control setup
