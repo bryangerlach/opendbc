@@ -39,11 +39,11 @@ def print_uds_response(label, data):
 
 def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=10):
   carlog.error("radar_tracks: enabling ...")
-
+  time.sleep(3)
   try:
     # Send reset first because the disable request below is not getting to the radar soon enough
     carlog.error("sending reset (0x11 0x01)")
-    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, addr, [RESET_REQUEST], [RESET_RESPONSE])
+    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [RESET_REQUEST], [RESET_RESPONSE])
     reset_query.get_data(timeout=0.1)
   except Exception:
     carlog.error("reset failed or unsupported")
