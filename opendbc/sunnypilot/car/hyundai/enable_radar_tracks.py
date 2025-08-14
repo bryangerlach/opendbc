@@ -39,7 +39,7 @@ def print_uds_response(label, data):
 
 def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=10):
   carlog.error("radar_tracks: enabling ...")
-  time.sleep(3)
+
   try:
     # Send reset first because the disable request below is not getting to the radar soon enough
     carlog.error("sending reset (0x11 0x01)")
@@ -88,7 +88,7 @@ if __name__ == "__main__":
   import cereal.messaging as messaging
   sendcan = messaging.pub_sock('sendcan')
   logcan = messaging.sub_sock('can')
-  time.sleep(1)
+  time.sleep(5)
 
   enabled = enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1)
   print(f"enabled: {enabled}")
