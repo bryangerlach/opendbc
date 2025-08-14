@@ -28,7 +28,7 @@ RESET_REQUEST = b'\x11\x01'
 RESET_RESPONSE = b''
 
 
-def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2):
+def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=2):
   carlog.error("radar_tracks: enabling ...")
 
   try:
@@ -81,5 +81,5 @@ if __name__ == "__main__":
   logcan = messaging.sub_sock('can')
   time.sleep(1)
 
-  enabled = enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1)
+  enabled = enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1)
   print(f"enabled: {enabled}")
