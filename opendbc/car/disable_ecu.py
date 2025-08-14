@@ -30,12 +30,12 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
     carlog.error(f"Radar silent on bus {bus} for {CONFIRM_TIMEOUT}s, confirmed disabled")
     return True
 
-  carlog.warning(f"ecu disable {hex(addr), sub_addr} ...")
+  carlog.warning(f"ecu disable {hex(addr), sub_addr}")
 
   for i in range(retry):
     try:
       # Send reset first because the disable request below is not getting to the radar soon enough
-      carlog.error("sending reset (0x11 0x01) ...")
+      carlog.error("sending reset (0x11 0x01)")
       reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [RESET_REQUEST], [RESET_RESPONSE])
       reset_query.get_data(timeout=0.1)
     except Exception:
@@ -64,6 +64,6 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
       except Exception:
         carlog.exception("ecu disable exception")
 
-    carlog.error(f"ecu disable retry ({i + 1}) ...bus {bus}")
+    carlog.error(f"ecu disable retry ({i + 1}) - bus {bus}")
   carlog.error(f"ecu disable failed bus {bus}")
   return False
