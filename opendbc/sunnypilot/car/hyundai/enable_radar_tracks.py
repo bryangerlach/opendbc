@@ -24,6 +24,9 @@ DEFAULT_CONFIG = bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x00])
 TRACKS_ENABLED_CONFIG = bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x01])
 TRACKS_ENABLED_CONFIG_BYTES = b"\x00\x00\x01\x00\x01"
 
+RESET_REQUEST = b'\x11\x01'
+RESET_RESPONSE = b''
+
 def print_uds_response(label, data):
   if not data:
     carlog.error(f"{label} → No response")
@@ -34,8 +37,16 @@ def print_uds_response(label, data):
   else:
     carlog.error(f"{label} → POSITIVE RESPONSE: {hex_data}")
 
-def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2):
+def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=10):
   carlog.error("radar_tracks: enabling ...")
+
+  try:
+    # Send reset first because the disable request below is not getting to the radar soon enough
+    carlog.error("sending reset (0x11 0x01)")
+    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, addr, [RESET_REQUEST], [RESET_RESPONSE])
+    reset_query.get_data(timeout=0.1)
+  except Exception:
+    carlog.error("reset failed or unsupported")
 
   for i in range(retry):
     try:
