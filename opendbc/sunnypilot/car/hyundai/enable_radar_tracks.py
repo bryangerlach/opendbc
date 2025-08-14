@@ -31,14 +31,6 @@ RESET_RESPONSE = b''
 def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=2):
   carlog.error("radar_tracks: enabling ...")
 
-  try:
-    # Send reset first because the disable request below is not getting to the radar soon enough
-    carlog.error("sending reset (0x11 0x01)")
-    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [RESET_REQUEST], [RESET_RESPONSE])
-    reset_query.get_data(timeout=0.1)
-  except Exception:
-    carlog.error("reset failed or unsupported")
-
   for i in range(retry):
     try:
       query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [CUSTOM_DIAGNOSTIC_REQUEST], [CUSTOM_DIAGNOSTIC_RESPONSE])
