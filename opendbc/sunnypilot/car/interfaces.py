@@ -18,5 +18,5 @@ def setup_interfaces(CP: structs.CarParams, CP_SP: structs.CarParamsSP, can_recv
 def _initialize_radar_tracks(CP: structs.CarParams, CP_SP: structs.CarParamsSP, can_recv: CanRecvCallable = None, can_send: CanSendCallable = None) -> None:
   if CP.brand == 'hyundai':
     if CP.flags & HyundaiFlags.MANDO_RADAR and (CP.radarUnavailable or CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC):
-      tracks_enabled = hyundai_enable_radar_tracks(can_recv, can_send, bus=0, addr=0x7d0)
+      tracks_enabled = hyundai_enable_radar_tracks(can_recv, can_send, bus=4, addr=0x7d0)
       CP.radarUnavailable = not tracks_enabled

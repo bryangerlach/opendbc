@@ -44,6 +44,7 @@ def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=5
   for i in range(retry):
     try:
       query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [CUSTOM_DIAGNOSTIC_REQUEST], [CUSTOM_DIAGNOSTIC_RESPONSE])
+      carlog.error(f"radar_tracks: sent diagnostic request on bus {bus}, address {addr}")
 
       for _, _ in query.get_data(timeout).items():
         carlog.error("radar_tracks: check current config ...")
@@ -82,7 +83,7 @@ if __name__ == "__main__":
   import cereal.messaging as messaging
   sendcan = messaging.pub_sock('sendcan')
   logcan = messaging.sub_sock('can')
-  time.sleep(10)
+  time.sleep(1)
 
   enabled = enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1)
   print(f"enabled: {enabled}")
