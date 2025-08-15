@@ -28,9 +28,23 @@ TRACKS_ENABLED_CONFIG_BYTES = b"\x00\x00\x01\x00\x01"
 RESET_REQUEST = b'\x11\x01'
 RESET_RESPONSE = b''
 
+def reset_radar(sendcan, logcan, bus, addr):
+  try:
+    # Send reset first because the request below is not getting to the radar soon enough
+    carlog.error("sending reset (0x11 0x01)")
+    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [RESET_REQUEST], [RESET_RESPONSE])
+    reset_query.get_data(timeout=0.1)
+    time.sleep(.2)
+  except Exception:
+    carlog.error("reset failed or unsupported")
+
 def uds_request(sendcan, logcan, bus, addr, req, resp, timeout=0.1):
     query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [req], [resp])
-    return query.get_data(timeout)
+    try:
+      data = query.get_data(timeout)
+    except:
+      data = None
+    return data
 
 def try_session(sendcan, logcan, bus, addr, session_id):
     carlog.error(f"=== Trying Diagnostic Session 0x{session_id:02X} ===")
@@ -67,13 +81,7 @@ def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=5
   carlog.error("radar_tracks: enabling ...")
   #time.sleep(10)
 
-  try:
-    # Send reset first because the request below is not getting to the radar soon enough
-    carlog.error("sending reset (0x11 0x01)")
-    reset_query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [RESET_REQUEST], [RESET_RESPONSE])
-    reset_query.get_data(timeout=0.1)
-  except Exception:
-    carlog.error("reset failed or unsupported")
+  reset_radar(sendcan, logcan, bus, addr)
 
   for i in range(retry):
     try:
