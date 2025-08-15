@@ -88,7 +88,7 @@ if __name__ == "__main__":
   import cereal.messaging as messaging
   sendcan = messaging.pub_sock('sendcan')
   logcan = messaging.sub_sock('can')
-  time.sleep(5)
+  time.sleep(7)
 
   enabled = enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1)
   print(f"enabled: {enabled}")
