@@ -31,6 +31,7 @@ RESET_RESPONSE = b''
 
 def enable_radar_tracks(logcan, sendcan, bus=4, addr=0x7d0, timeout=0.1, retry=5):
   carlog.error("radar_tracks: enabling ...")
+  time.sleep(10)
 
   try:
     # Send reset first because the request below is not getting to the radar soon enough
