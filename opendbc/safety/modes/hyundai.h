@@ -337,6 +337,7 @@ static safety_config hyundai_init(uint16_t param) {
     {0x50, 0, 16, .check_relay = true},
     {0x4F1, 1, 4, .check_relay = false},
     {0x2A4, 0, 24, .check_relay = true},
+    {0x364, 1, 8, .check_relay = true}, /* ALERTS_364*/
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_HDA2_LONG_TX_MSGS[] = {
@@ -358,6 +359,7 @@ static safety_config hyundai_init(uint16_t param) {
     {0x39b, 1, 8, .check_relay = false},
     {0x39c, 1, 8, .check_relay = false},
     {0x43a, 1, 8, .check_relay = false},
+    {0x364, 1, 8, .check_relay = true}, /* ALERTS_364*/
   };
 
   static const CanMsg HYUNDAI_LONG_ESCC_TX_MSGS[] = {
