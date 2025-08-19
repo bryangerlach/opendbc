@@ -53,13 +53,10 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
           results = query.get_data(0)
           for (rx_addr, _), data in results.items():
             carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
-
-          # Confirm radar silence after disable
-          if confirm_radar_silent():
-            carlog.error(f"ecu disabled on bus {bus}")
+            if data[:3].hex() == "7f2822":
+              carlog.error("Received negative response Conditions Not Met, will retry ...")
+              break
             return True
-          else:
-            carlog.error("Radar still transmitting after disable attempt")
 
       except Exception:
         carlog.exception("ecu disable exception")
