@@ -1,8 +1,13 @@
 from opendbc.car.carlog import carlog
 from opendbc.car.isotp_parallel_query import IsoTpParallelQuery
+import time
 
 EXT_DIAG_REQUEST = b'\x10\x03'
 EXT_DIAG_RESPONSE = b'\x50\x03'
+
+RESET_REQUEST = b'\x11\x01'
+RESET_RESPONSE = b''
+CONFIRM_TIMEOUT = 1.0
 
 COM_CONT_RESPONSE = b''
 
@@ -17,20 +22,34 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
 
   for i in range(retry):
     try:
-      query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
-
-      for _, _ in query.get_data(timeout).items():
-        carlog.warning("communication control disable tx/rx ...")
-
-        query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
-        query.get_data(0)
-
-        carlog.warning("ecu disabled")
-        return True
-
+      # Send reset first because the disable request below is not getting to the radar soon enough
+      carlog.error("sending reset (0x11 0x01) ...")
+      reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [RESET_REQUEST], [RESET_RESPONSE])
+      reset_query.get_data(timeout=0.1)
     except Exception:
-      carlog.exception("ecu disable exception")
+      carlog.error("reset failed or unsupported")
 
-    carlog.error(f"ecu disable retry ({i + 1}) ...")
-  carlog.error("ecu disable failed")
+    for i in range(retry):
+      try:
+        query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
+
+        results = query.get_data(timeout)
+        for (rx_addr, _), data in results.items():
+          carlog.error(f"Received EXT_DIAG_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
+
+          query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
+          results = query.get_data(0)
+          for (rx_addr, _), data in results.items():
+            carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
+            if data[:3].hex() == "7f2822":
+              carlog.error("Received negative response Conditions Not Met, will retry ...")
+              time.sleep(.2)
+              break
+            return True
+
+      except Exception:
+        carlog.exception("ecu disable exception")
+
+    carlog.error(f"ecu disable retry ({i + 1}) ...bus {bus}")
+  carlog.error(f"ecu disable failed bus {bus}")
   return False
