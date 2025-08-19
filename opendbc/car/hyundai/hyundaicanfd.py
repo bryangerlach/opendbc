@@ -75,6 +75,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
 
 def create_suppress_daw(packer, msg_364, frame, CAN, CP):
   msg_364["DAW_Status"] = 3
+  msg_364["DAW_Warning"] = 0
 
   msg_364["COUNTER"] = frame % 0xF
   dat = packer.make_can_msg("ALERTS_364", CAN.ECAN, msg_364)[1]
