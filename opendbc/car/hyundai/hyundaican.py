@@ -253,15 +253,15 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     return values
 
   scc11_values = get_scc11_values()
-  scc11_values = calculate_checksum(scc11_values)
+  scc11_values = calculate_checksum("SCC11", scc11_values)
   commands.append(packer.make_can_msg("SCC11", bus, scc11_values))
 
   scc12_values = get_scc12_values()
-  scc12_values = calculate_checksum(scc12_values)
+  scc12_values = calculate_checksum("SCC12", scc12_values)
   commands.append(packer.make_can_msg("SCC12", bus, scc12_values))
 
   scc14_values = get_scc14_values()
-  scc14_values = calculate_checksum(scc14_values)
+  scc14_values = calculate_checksum("SCC14", scc14_values)
   commands.append(packer.make_can_msg("SCC14", bus, scc14_values))
 
   # Only send FCA11 on cars where it exists on the bus
@@ -271,7 +271,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     # note that some vehicles most likely have an alternate checksum/counter definition
     # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
     fca11_values = get_fca11_values()
-    fca11_values = calculate_checksum(fca11_values)
+    fca11_values = calculate_checksum("FCA11", fca11_values)
     commands.append(packer.make_can_msg("FCA11", bus, fca11_values))
 
   return commands
