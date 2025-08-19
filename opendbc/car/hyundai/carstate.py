@@ -155,7 +155,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       self.dawStatus = cp.vl["ALERTS_364"]["DAW_Status"]
       # Consider Taking a Break message
       if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-        self.msg_364 = copy.copy(cp_cam.vl["ALERTS_364"])
+        self.msg_364 = copy.copy(cp.vl["ALERTS_364"])
     else:
       ret.dawStatus = 6
       self.dawStatus = 6
