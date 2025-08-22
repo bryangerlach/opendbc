@@ -1,4 +1,3 @@
-import time
 from opendbc.car.carlog import carlog
 from opendbc.car.isotp_parallel_query import IsoTpParallelQuery
 
@@ -7,63 +6,46 @@ EXT_DIAG_RESPONSE = b'\x50\x03'
 
 RESET_REQUEST = b'\x11\x01'
 RESET_RESPONSE = b''
-CONFIRM_TIMEOUT = 1.0
 
 COM_CONT_RESPONSE = b''
 
 
-def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_req=b'\x28\x83\x01', timeout=0.1, retry=10):
+def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_req=b'\x28\x83\x01', timeout=0.1, retry=10, reset=False):
   """Silence an ECU by disabling sending and receiving messages using UDS 0x28.
   The ECU will stay silent as long as openpilot keeps sending Tester Present.
 
   This is used to disable the radar in some cars. Openpilot will emulate the radar.
   WARNING: THIS DISABLES AEB!"""
+  carlog.warning(f"ecu disable {hex(addr), sub_addr} ...")
 
-  def confirm_radar_silent():
-    radar_msgs = [0x420, 0x421, 0x389]
-    start_time = time.monotonic()
-    while time.monotonic() - start_time < CONFIRM_TIMEOUT:
-      msg = can_recv()
-      if msg and msg[0] == bus and msg[1] in radar_msgs:
-        carlog.error(f"Radar still sending {hex(msg[1])} on bus {bus}")
-        return False
-    carlog.error(f"Radar silent on bus {bus} for {CONFIRM_TIMEOUT}s, confirmed disabled")
-    return True
-
-  carlog.warning(f"ecu disable {hex(addr), sub_addr}")
-
-  for i in range(retry):
+  if reset:
     try:
       # Send reset first because the disable request below is not getting to the radar soon enough
-      carlog.error("sending reset (0x11 0x01)")
+      carlog.error("sending reset (0x11 0x01) ...")
       reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [RESET_REQUEST], [RESET_RESPONSE])
       reset_query.get_data(timeout=0.1)
     except Exception:
       carlog.error("reset failed or unsupported")
 
-    for i in range(retry):
-      try:
-        query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
+  for i in range(retry):
+    try:
+      query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
 
-        results = query.get_data(timeout)
-        for (rx_addr, _), data in results.items():
-          carlog.error(f"Received EXT_DIAG_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
+      for (rx_addr, _), data in query.get_data(timeout).items():
+        carlog.warning("communication control disable tx/rx ...")
+        carlog.error(f"Received EXT_DIAG_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
 
-          query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
-          results = query.get_data(0)
-          for (rx_addr, _), data in results.items():
-            carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
+        query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [com_cont_req], [COM_CONT_RESPONSE])
+        for (rx_addr, _), data in query.get_data(0).items():
+          carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
+          if data[:1].hex() == "7f":
+            carlog.error("Received negative response, will retry ...")
+            break
+          return True
 
-          # Confirm radar silence after disable
-          if confirm_radar_silent():
-            carlog.error(f"ecu disabled on bus {bus}")
-            return True
-          else:
-            carlog.error("Radar still transmitting after disable attempt")
+    except Exception:
+      carlog.exception("ecu disable exception")
 
-      except Exception:
-        carlog.exception("ecu disable exception")
-
-    carlog.error(f"ecu disable retry ({i + 1}) - bus {bus}")
+    carlog.error(f"ecu disable retry ({i + 1}) ...")
   carlog.error(f"ecu disable failed bus {bus}")
   return False
