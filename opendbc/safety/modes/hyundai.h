@@ -311,16 +311,6 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
   return tx;
 }
 
-bool hyundai_fwd_hook(int bus_num, int addr) {
-  if ((bus_num == 0 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
-    return true;  // Block radar SCC messages
-  }
-  if ((bus_num == 2 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
-    return true;  // Block radar SCC messages
-  }
-  return false;  // Forward all else from bus 4 to 132
-}
-
 static safety_config hyundai_init(uint16_t param) {
   static const CanMsg HYUNDAI_LONG_TX_MSGS[] = {
     HYUNDAI_LONG_COMMON_TX_MSGS(0, false)
@@ -531,7 +521,6 @@ const safety_hooks hyundai_hooks = {
   .init = hyundai_init,
   .rx = hyundai_rx_hook,
   .tx = hyundai_tx_hook,
-  .fwd = hyundai_fwd_hook,
   .get_counter = hyundai_get_counter,
   .get_checksum = hyundai_get_checksum,
   .compute_checksum = hyundai_compute_checksum,
