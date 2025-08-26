@@ -249,7 +249,12 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
     }
   }
 
-  if (msg->addr == 0x421U) {
+  if (msg->addr == 0x420U && !hyundai_can_canfd_blended) {
+    acc_main_on_tx = GET_BIT(msg, 0U);
+    hyundai_common_acc_main_on_sync();
+  }
+
+  if (msg->addr == 0x421U && hyundai_can_canfd_blended) {
     acc_main_on_tx = GET_BIT(msg, 27U);
     hyundai_common_acc_main_on_sync();
   }
@@ -268,8 +273,10 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
 
     violation |= longitudinal_accel_checks(desired_accel_raw, HYUNDAI_LONG_LIMITS);
     violation |= longitudinal_accel_checks(desired_accel_val, HYUNDAI_LONG_LIMITS);
-    violation |= (aeb_decel_cmd != 0);
-    violation |= aeb_req;
+    if (!hyundai_escc) {
+      violation |= (aeb_decel_cmd != 0);
+      violation |= aeb_req;
+    }
 
     if (violation) {
       tx = false;
@@ -309,16 +316,6 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
   }
 
   return tx;
-}
-
-bool hyundai_fwd_hook(int bus_num, int addr) {
-  if ((bus_num == 0 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
-    return true;  // Block radar SCC messages
-  }
-  if ((bus_num == 2 && (addr == 0x420 || addr == 0x421 || addr == 0x389)) && hyundai_longitudinal) {
-    return true;  // Block radar SCC messages
-  }
-  return false;  // Forward all else from bus 4 to 132
 }
 
 static safety_config hyundai_init(uint16_t param) {
@@ -365,9 +362,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
-    //hyundai_longitudinal = false;
   }
-
 
   safety_config ret;
   if (hyundai_longitudinal) {
@@ -531,7 +526,6 @@ const safety_hooks hyundai_hooks = {
   .init = hyundai_init,
   .rx = hyundai_rx_hook,
   .tx = hyundai_tx_hook,
-  .fwd = hyundai_fwd_hook,
   .get_counter = hyundai_get_counter,
   .get_checksum = hyundai_get_checksum,
   .compute_checksum = hyundai_compute_checksum,

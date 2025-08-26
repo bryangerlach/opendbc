@@ -102,7 +102,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
 
     # tester present - w/ no response (keeps relevant ECU disabled)
-    if self.frame % 100 == 0 and not ((self.CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC)) or self.ESCC.enabled) and \
+    if self.frame % 100 == 0 and not ((self.CP.flags & HyundaiFlags.CANFD_CAMERA_SCC) or self.ESCC.enabled) and \
             self.CP.openpilotLongitudinalControl:
       # for longitudinal control, either radar or ADAS driving ECU
       addr, bus = 0x7d0, self.CAN.ECAN if (self.CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED)) else 0
@@ -113,8 +113,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       # for blinkers
       if self.CP.flags & HyundaiFlags.ENABLE_BLINKERS:
         can_sends.append(make_tester_present_msg(0x7b1, self.CAN.ECAN, suppress_response=True))
-
-
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD:
@@ -186,11 +184,10 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     # 20 Hz LFA MFA message
     if self.frame % 5 == 0 and self.CP.flags & HyundaiFlags.SEND_LFA.value:
       can_sends.append(hyundaican.create_lfahda_mfc(self.packer, self.frame, self.CP, CC.enabled, self.lfa_icon))
-      #can_sends.append(hyundaican.create_lfahda_mfc(self.packer, CC.enabled, self.lfa_icon))
 
     # 5 Hz ACC options
     if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl and not can_canfd_blended:
-      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.CAN, self.ESCC))
+      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.ESCC))
 
     # 2 Hz front radar options
     if self.frame % 50 == 0 and self.CP.openpilotLongitudinalControl and not self.ESCC.enabled and not can_canfd_blended:

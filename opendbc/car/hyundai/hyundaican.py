@@ -213,16 +213,18 @@ def create_lfahda_mfc(packer, frame, CP, enabled, lfa_icon):
 def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
                         main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
+  bus = CAN.ECAN
 
-  msg_values = [
-    ("SCC11", {
+  def get_scc11_values():
+    return {
       "aReqRaw": tuning.desired_accel,
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-    }),
+    }
 
-    ("SCC12", {
+  def get_scc12_values():
+    return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
@@ -230,28 +232,49 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACC_ObjDist": 1,
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if stopping else 0,
-    }),
+    }
 
-    ("SCC14", {
+  def get_scc14_values():
+    return {
       "ACC_ObjLatPos": 0,
       "ObjValid": 1,
       "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
-    }),
+    }
 
-    ("FCA11", {
+  def get_fca11_values():
+    return {
       "BYTE4": 0xC0,
       "BYTE5": 0x3F,
       "BYTE6": 0x7F,
-    }),
-  ]
+    }
 
-  bus = CAN.ECAN
-
-  for addr, values in msg_values:
+  def calculate_checksum(addr, values):
     values["COUNTER"] = idx % 0xF
     checksum = create_checksum_can_canfd_blended(packer, bus, addr, values)
     values["CHECKSUM"] = checksum
-    commands.append(packer.make_can_msg(addr, bus, values))
+    return values
+
+  scc11_values = get_scc11_values()
+  scc11_values = calculate_checksum("SCC11", scc11_values)
+  commands.append(packer.make_can_msg("SCC11", bus, scc11_values))
+
+  scc12_values = get_scc12_values()
+  scc12_values = calculate_checksum("SCC12", scc12_values)
+  commands.append(packer.make_can_msg("SCC12", bus, scc12_values))
+
+  scc14_values = get_scc14_values()
+  scc14_values = calculate_checksum("SCC14", scc14_values)
+  commands.append(packer.make_can_msg("SCC14", bus, scc14_values))
+
+  # Only send FCA11 on cars where it exists on the bus
+  # On Camera SCC cars, FCA11 is not disabled, so we forward stock FCA11 back to the car forward hooks
+  # If we don't use ESCC since ESCC does not block FCA11 from stock radar
+  if use_fca and not ((CP.flags & HyundaiFlags.CAMERA_SCC) or (ESCC and ESCC.enabled)):
+    # note that some vehicles most likely have an alternate checksum/counter definition
+    # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
+    fca11_values = get_fca11_values()
+    fca11_values = calculate_checksum("FCA11", fca11_values)
+    commands.append(packer.make_can_msg("FCA11", bus, fca11_values))
 
   return commands
 
@@ -346,7 +369,7 @@ def create_acc_commands(packer, enabled, accel, upper_jerk, idx, hud_control, se
   return commands
 
 
-def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
+def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
   """
     Creates SCC13 and FCA12. If ESCC is enabled, it will only create SCC13 since ESCC does not block FCA12.
     :param packer:
@@ -370,7 +393,7 @@ def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
   scc13_values = get_scc13_values()
-  commands.append(packer.make_can_msg("SCC13", CAN.ECAN, scc13_values))
+  commands.append(packer.make_can_msg("SCC13", 0, scc13_values))
 
   # If ESCC is available and enabled, we skip FCA12, since ESCC does not block FCA12
   if ESCC and ESCC.enabled:
@@ -380,7 +403,7 @@ def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
   # On Camera SCC cars, FCA12 is not disabled, so we forward stock FCA12 back to the car forward hooks
   if not (CP.flags & HyundaiFlags.CAMERA_SCC):
     fca12_values = get_fca12_values()
-    commands.append(packer.make_can_msg("FCA12", CAN.ECAN, fca12_values))
+    commands.append(packer.make_can_msg("FCA12", 0, fca12_values))
 
   return commands
 
