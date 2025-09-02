@@ -217,7 +217,7 @@ class CarInterface(CarInterfaceBase):
     if communication_control is None:
       communication_control = bytes([uds.SERVICE_TYPE.COMMUNICATION_CONTROL, 0x80 | uds.CONTROL_TYPE.DISABLE_RX_DISABLE_TX, uds.MESSAGE_TYPE.NORMAL])
 
-    if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
+    if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC | HyundaiFlags.CAN_CANFD_BLENDED)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
 
       addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
