@@ -64,7 +64,8 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     self.buttons_counter = 0
 
     self.cruise_info = {}
-    self.msg_364 = {}
+    if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED and not CP.flags & HyundaiFlags.CANFD_LKA_STEERING:
+      self.msg_364 = {}
 
     # On some cars, CLU15->CF_Clu_VehicleSpeed can oscillate faster than the dash updates. Sample at 5 Hz
     self.cluster_speed = 0
@@ -142,7 +143,7 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ret.cruiseState.speed = cp_cruise.vl[scc_msg]["VSetDis"] * speed_conv
 
     # Consider Taking a Break message
-    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED and not self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING:
       self.msg_364 = copy.copy(cp_cam.vl["ALERTS_364"])
 
     # TODO: Find brake pressure
@@ -193,7 +194,10 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
       ret.rightBlindspot = cp.vl["LCA11"]["CF_Lca_IndRight"] != 0
 
     # save the entire LKAS11 and CLU11
-    self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
+    if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED and self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING:
+      self.lfa_block_msg = copy.copy(cp_cam.vl["CAM_0x2a4"])
+    else:
+      self.lkas11 = copy.copy(cp_cam.vl["LKAS11"])
     self.clu11 = copy.copy(cp.vl["CLU11"])
     self.steer_state = cp.vl["MDPS12"]["CF_Mdps_ToiActive"]  # 0 NOT ACTIVE, 1 ACTIVE
     prev_cruise_buttons = self.cruise_buttons[-1]

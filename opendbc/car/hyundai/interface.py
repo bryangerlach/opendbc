@@ -88,7 +88,8 @@ class CarInterface(CarInterfaceBase):
     else:
       # Shared configuration for non CAN-FD cars
       ret.alphaLongitudinalAvailable = candidate not in UNSUPPORTED_LONGITUDINAL_CAR
-      ret.enableBsm = 0x58b in fingerprint[CAN.ECAN]
+      bsm_bus = CAN.ECAN if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
+      ret.enableBsm = 0x58b in fingerprint[bsm_bus]
 
       # Send LFA message on cars with HDA
       if 0x485 in fingerprint[CAN.CAM]:
