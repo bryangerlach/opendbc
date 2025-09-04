@@ -174,8 +174,6 @@ struct CarState {
   standstill @18 :Bool;
   wheelSpeeds @2 :WheelSpeeds;
 
-  dawStatus @61 :UInt8;
-
   gasPressed @4 :Bool;    # this is user pedal only
 
   # brake pedal, 0.0-1.0

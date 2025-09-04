@@ -65,7 +65,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
 
     self.cruise_info = {}
     self.msg_364 = {}
-    self.dawStatus = 5
 
     # On some cars, CLU15->CF_Clu_VehicleSpeed can oscillate faster than the dash updates. Sample at 5 Hz
     self.cluster_speed = 0
@@ -145,8 +144,6 @@ class CarState(CarStateBase, EsccCarStateBase, MadsCarState, CarStateExt):
     # Consider Taking a Break message
     if self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.msg_364 = copy.copy(cp_cam.vl["ALERTS_364"])
-      self.dawStatus = cp_cam.vl["ALERTS_364"]["DAW_Status"]
-      ret.dawStatus = cp_cam.vl["ALERTS_364"]["DAW_Status"]
 
     # TODO: Find brake pressure
     ret.brake = 0
