@@ -209,8 +209,9 @@ def create_lfahda_mfc(packer, frame, CP, enabled, lfa_icon):
 
   return packer.make_can_msg("LFAHDA_MFC", bus, values)
 
-def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
-                        main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
+def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
+                                          hud_control, set_speed, stopping, long_override, use_fca, CP,
+                                          main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
   bus = CAN.ECAN
 
@@ -228,7 +229,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
       "VSetDis": set_speed if enabled else 0,
-      "ACC_ObjDist": 1,
+      "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if stopping else 0,
     }
@@ -236,8 +237,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   def get_scc14_values():
     return {
       "ACC_ObjLatPos": 0,
-      "ObjValid": 1,
-      "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
+      "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
+      "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
     }
 
   def get_fca11_values():
