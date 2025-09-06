@@ -172,12 +172,10 @@ class CarInterface(CarInterfaceBase):
       # TODO-SP: add route with ESCC message for process replay
       if ESCC_MSG in fingerprint[0]:
         ret.flags |= HyundaiFlagsSP.ENHANCED_SCC.value
-    ret.flags |= HyundaiFlagsSP.ENHANCED_SCC.value
 
     if ret.flags & HyundaiFlagsSP.ENHANCED_SCC:
       ret.safetyParam |= HyundaiSafetyFlagsSP.ESCC
       stock_cp.radarUnavailable = False
-    stock_cp.radarUnavailable = True
 
     if stock_cp.flags & HyundaiFlags.HAS_LDA_BUTTON:
       ret.safetyParam |= HyundaiSafetyFlagsSP.HAS_LDA_BUTTON
