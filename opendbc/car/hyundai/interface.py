@@ -175,7 +175,8 @@ class CarInterface(CarInterfaceBase):
 
     if ret.flags & HyundaiFlagsSP.ENHANCED_SCC:
       ret.safetyParam |= HyundaiSafetyFlagsSP.ESCC
-      stock_cp.radarUnavailable = False
+      if not stock_cp.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+        stock_cp.radarUnavailable = False
 
     if stock_cp.flags & HyundaiFlags.HAS_LDA_BUTTON:
       ret.safetyParam |= HyundaiSafetyFlagsSP.HAS_LDA_BUTTON
