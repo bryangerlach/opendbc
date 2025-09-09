@@ -188,7 +188,7 @@ BO_ 640 EMS13: 8 XXX
  SG_ TCO : 24|8@1+ (0.75,-48) [0|0] "" XXX
  SG_ TIA : 48|8@1+ (0.75,-48) [0|0] "" XXX
 
-BO_ 683 ESCC: 8 XXX
+BO_ 1058 ESCC: 8 XXX
  SG_ FCA_CmdAct : 0|1@1+ (1,0) [0|1] "" ESC
  SG_ CF_VSM_Warn_FCA11 : 1|2@1+ (1,0) [0|3] "" ACU,CLU,ESC
  SG_ AEB_CmdAct : 3|1@1+ (1,0) [0|1] "" ESC
