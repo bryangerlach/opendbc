@@ -425,6 +425,7 @@ static safety_config hyundai_init(uint16_t param) {
     static RxCheck hyundai_can_canfd_blended_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false)
       HYUNDAI_SCC12_ADDR_CHECK(0, true)
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK
     };
     SET_TX_MSGS(HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS, ret)
     SET_RX_CHECKS(hyundai_can_canfd_blended_rx_checks, ret)
