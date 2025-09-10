@@ -55,8 +55,8 @@ const LongitudinalLimits HYUNDAI_LONG_LIMITS = {
 #define HYUNDAI_FCEV_GAS_ADDR_CHECK \
   {.msg = {{0x91,  0, 8, 100U, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}}, \
 
-#define HYUNDAI_LDA_BUTTON_ADDR_CHECK \
-  {.msg = {{0x391, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
+#define HYUNDAI_LDA_BUTTON_ADDR_CHECK(pt_bus) \
+  {.msg = {{0x391, (pt_bus), 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true, .frequency = 50U}, { 0 }, { 0 }}}, \
 
 #define HYUNDAI_NON_SCC_HEV_ADDR_CHECK \
   {.msg = {{0x595U, 0, 8, 10U, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}}, \
@@ -76,12 +76,12 @@ RxCheck hyundai_rx_checks[] = {
 RxCheck hyundai_can_canfd_blended_hda2_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
   HYUNDAI_SCC12_ADDR_CHECK(true, 1)
-  HYUNDAI_LDA_BUTTON_ADDR_CHECK
+  HYUNDAI_LDA_BUTTON_ADDR_CHECK(1)
 };
 
 RxCheck hyundai_can_canfd_blended_hda2_long_rx_checks[] = {
   HYUNDAI_COMMON_RX_CHECKS(false, true, 1)
-  HYUNDAI_LDA_BUTTON_ADDR_CHECK
+  HYUNDAI_LDA_BUTTON_ADDR_CHECK(1)
 };
 
 static bool hyundai_legacy = false;
@@ -406,7 +406,7 @@ static safety_config hyundai_init(uint16_t param) {
 
     static RxCheck hyundai_lda_button_long_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     static RxCheck hyundai_fcev_long_rx_checks[] = {
@@ -417,7 +417,7 @@ static safety_config hyundai_init(uint16_t param) {
     static RxCheck hyundai_fcev_lda_button_long_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
       HYUNDAI_FCEV_GAS_ADDR_CHECK
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     if (hyundai_fcev_gas_signal) {
@@ -450,7 +450,7 @@ static safety_config hyundai_init(uint16_t param) {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
       HYUNDAI_SCC12_ADDR_CHECK(2,false)
       HYUNDAI_SCC11_ADDR_CHECK(2)
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     ret = BUILD_SAFETY_CFG(hyundai_cam_scc_rx_checks, HYUNDAI_CAMERA_SCC_TX_MSGS);
@@ -467,7 +467,7 @@ static safety_config hyundai_init(uint16_t param) {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
       HYUNDAI_SCC12_ADDR_CHECK(0, false)
       HYUNDAI_SCC11_ADDR_CHECK(0)
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     static RxCheck hyundai_fcev_rx_checks[] = {
@@ -482,7 +482,7 @@ static safety_config hyundai_init(uint16_t param) {
       HYUNDAI_SCC12_ADDR_CHECK(0, false)
       HYUNDAI_SCC11_ADDR_CHECK(0)
       HYUNDAI_FCEV_GAS_ADDR_CHECK
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     static RxCheck hyundai_non_scc_addr_checks[] = {
@@ -491,7 +491,7 @@ static safety_config hyundai_init(uint16_t param) {
 
     static RxCheck hyundai_non_scc_lda_button_addr_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     static RxCheck hyundai_hev_non_scc_addr_checks[] = {
@@ -502,7 +502,7 @@ static safety_config hyundai_init(uint16_t param) {
     static RxCheck hyundai_hev_non_scc_lda_button_addr_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
       HYUNDAI_NON_SCC_HEV_ADDR_CHECK
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     static RxCheck hyundai_ev_non_scc_addr_checks[] = {
@@ -513,7 +513,7 @@ static safety_config hyundai_init(uint16_t param) {
     static RxCheck hyundai_ev_non_scc_lda_button_addr_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false, false, 0)
       HYUNDAI_NON_SCC_EV_ADDR_CHECK
-      HYUNDAI_LDA_BUTTON_ADDR_CHECK
+      HYUNDAI_LDA_BUTTON_ADDR_CHECK(0)
     };
 
     SET_TX_MSGS(HYUNDAI_TX_MSGS, ret);
