@@ -199,9 +199,8 @@ BO_ 683 ESCC: 8 XXX
  SG_ ObjValid : 16|1@1+ (1,0) [0|1] "" CLU,ESC,TCU
  SG_ ACC_ObjStatus : 17|2@1+ (1,0) [0|3] "" ABS,ESC
  SG_ ESCC_WD_Fail_Count : 21|3@1+ (1,0) [0|15] "" XXX
- SG_ ACC_ObjLatPos : 24|9@1+ (0.1,-20) [-20|31.1] "m" ABS,ESC
- SG_ ACC_ObjRelSpd : 44|12@1+ (0.1,-170) [-170|239.5] "m/s" ABS,ESC
- SG_ ACC_ObjDist : 33|11@1+ (0.1,0) [0|204.7] "m" ABS,ESC
+ SG_ ACC_ObjRelSpd : 40|9@1+ (0.1,-16.4) [0|0] "m/s" ABS,ESC
+ SG_ ACC_ObjDist : 24|11@1+ (0.1,0) [0|204.7] "m" ABS,ESC
  SG_ CR_VSM_DecCmd_FCA11 : 56|8@1+ (0.01,0) [0|2.55] "g" ESC
 
 BO_ 688 SAS11: 5 XXX
@@ -352,7 +351,7 @@ BO_ 903 WHL_PUL11: 6 XXX
  SG_ WHL_PUL_RR : 24|8@1+ (0.5,0) [0|0] "" XXX
 
 BO_ 905 SCC14: 8 XXX
- SG_ ACC_ObjLatPos : 16|9@1+ (0.1,-20) [-20|31.1] "m" ABS,ESC
+ SG_ ACC_ObjRelSpd : 16|9@1+ (0.1,-20) [-20|31.1] "m/s" ABS,ESC
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|0] "" XXX
  SG_ COUNTER : 12|4@1+ (1,0) [0|0] "" XXX
  SG_ ObjValid : 27|1@1+ (1,0) [0|1] "" CLU,ESC,TCU
