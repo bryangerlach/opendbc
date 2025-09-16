@@ -49,6 +49,9 @@ bool hyundai_fcev_gas_signal = false;
 extern bool hyundai_alt_limits_2;
 bool hyundai_alt_limits_2 = false;
 
+extern bool hyundai_can_canfd_blended;
+bool hyundai_can_canfd_blended = false;
+
 // ESCC
 extern bool hyundai_escc;
 bool hyundai_escc = false;
@@ -77,6 +80,7 @@ void hyundai_common_init(uint16_t param) {
   const int HYUNDAI_PARAM_ALT_LIMITS = 64; // TODO: shift this down with the rest of the common flags
   const int HYUNDAI_PARAM_FCEV_GAS = 256;
   const int HYUNDAI_PARAM_ALT_LIMITS_2 = 512;
+  const int HYUNDAI_PARAM_CAN_CANFD_BLENDED = 1024;
 
   hyundai_ev_gas_signal = GET_FLAG(param, HYUNDAI_PARAM_EV_GAS);
   hyundai_hybrid_gas_signal = !hyundai_ev_gas_signal && GET_FLAG(param, HYUNDAI_PARAM_HYBRID_GAS);
@@ -85,6 +89,7 @@ void hyundai_common_init(uint16_t param) {
   hyundai_alt_limits = GET_FLAG(param, HYUNDAI_PARAM_ALT_LIMITS);
   hyundai_fcev_gas_signal = GET_FLAG(param, HYUNDAI_PARAM_FCEV_GAS);
   hyundai_alt_limits_2 = GET_FLAG(param, HYUNDAI_PARAM_ALT_LIMITS_2);
+  hyundai_can_canfd_blended = GET_FLAG(param, HYUNDAI_PARAM_CAN_CANFD_BLENDED);
 
   hyundai_escc = GET_FLAG(current_safety_param_sp, HYUNDAI_PARAM_SP_ESCC);
   hyundai_longitudinal_main_cruise_toggleable = GET_FLAG(current_safety_param_sp, HYUNDAI_PARAM_SP_LONGITUDINAL_MAIN_CRUISE_TOGGLEABLE);
@@ -153,7 +158,6 @@ void hyundai_common_cruise_buttons_check(const int cruise_button, const bool mai
   }
 }
 
-#ifdef CANFD
 uint32_t hyundai_common_canfd_compute_checksum(const CANPacket_t *msg) {
   int len = GET_LEN(msg);
   uint32_t address = msg->addr;
@@ -178,7 +182,6 @@ uint32_t hyundai_common_canfd_compute_checksum(const CANPacket_t *msg) {
 
   return crc;
 }
-#endif
 
 // reset mismatches on rising edge of acc_main_on to avoid rare race conditions when using non-PCM main cruise state
 void hyundai_common_reset_acc_main_on_mismatches(void) {

@@ -88,7 +88,8 @@ class CarInterface(CarInterfaceBase):
     else:
       # Shared configuration for non CAN-FD cars
       ret.alphaLongitudinalAvailable = candidate not in UNSUPPORTED_LONGITUDINAL_CAR
-      ret.enableBsm = 0x58b in fingerprint[0]
+      bsm_bus = CAN.ECAN if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
+      ret.enableBsm = 0x58b in fingerprint[bsm_bus]
 
       # Send LFA message on cars with HDA
       if 0x485 in fingerprint[2]:
@@ -102,13 +103,22 @@ class CarInterface(CarInterfaceBase):
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
         ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.hyundaiLegacy)]
       else:
-        ret.safetyConfigs = [get_safety_config(structs.CarParams.SafetyModel.hyundai, 0)]
+        cfgs = [get_safety_config(structs.CarParams.SafetyModel.hyundai), ]
+        if CAN.ECAN >= 4:
+          cfgs.insert(0, get_safety_config(structs.CarParams.SafetyModel.noOutput))
+        ret.safetyConfigs = cfgs
 
       if ret.flags & HyundaiFlags.CAMERA_SCC:
         ret.safetyConfigs[0].safetyParam |= HyundaiSafetyFlags.CAMERA_SCC.value
 
+      if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+        ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAN_CANFD_BLENDED.value
+
+      if lka_steering:
+        ret.flags |= HyundaiFlags.CANFD_LKA_STEERING.value
+
       # These cars have the LFA button on the steering wheel
-      if 0x391 in fingerprint[0]:
+      if 0x391 in fingerprint[0] or ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
         ret.flags |= HyundaiFlags.HAS_LDA_BUTTON.value
 
     # Common lateral control setup
@@ -117,6 +127,19 @@ class CarInterface(CarInterfaceBase):
     ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 0.4
     CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
+
+    if candidate == CAR.HYUNDAI_PALISADE_2023:
+      for fw in car_fw:
+        if fw.ecu == "eps":
+          platform_str = "HYUNDAI_PALISADE_2023_EPS_4LXPC100" if fw.fwVersion.endswith(b'4LXPC100') else \
+            "HYUNDAI_PALISADE_2023_EPS_2427" if fw.fwVersion.endswith(b'2427') else \
+              candidate
+
+          CarInterfaceBase.configure_torque_tune(platform_str, ret.lateralTuning)
+
+          if platform_str == "HYUNDAI_PALISADE_2023_EPS_2427":
+            # We only limit in the controller, panda safety limits apply for both Palisade HDA2 and Telluride HDA2
+            ret.flags |= HyundaiFlags.ALT_LIMITS.value
 
     if ret.flags & HyundaiFlags.ALT_LIMITS:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.ALT_LIMITS.value
@@ -136,6 +159,9 @@ class CarInterface(CarInterfaceBase):
     ret.vEgoStarting = 0.1
     ret.startAccel = 1.0
     ret.longitudinalActuatorDelay = 0.5
+
+    if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      ret.stoppingDecelRate = 0.4
 
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.LONG.value
@@ -212,7 +238,7 @@ class CarInterface(CarInterfaceBase):
 
     if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
-      addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CANFD else 0
+      addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
       if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, CanBus(CP).ECAN
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=communication_control)
