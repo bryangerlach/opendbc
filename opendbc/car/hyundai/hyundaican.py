@@ -236,7 +236,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
   def get_scc14_values():
     return {
-      "ACC_ObjLatPos": 0,
+      "ACC_ObjRelSpd": lead_data.lead_rel_speed,
       "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
       "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
     }
