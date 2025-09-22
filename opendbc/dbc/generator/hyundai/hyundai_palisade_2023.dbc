@@ -361,7 +361,8 @@ BO_ 909 FCA11: 8 XXX
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|255] "" XXX
  SG_ COUNTER : 12|4@1+ (1,0) [0|0] "" XXX
  SG_ aeb_cmd_act : 16|1@1+ (1,0) [0|1] "" XXX
- SG_ fca_cmd_act : 19|1@1+ (1,0) [0|0] "" XXX
+ SG_ fca_cmd_act : 19|1@1+ (1,0) [0|1] "" XXX
+ SG_ fca_fault : 32|2@1+ (1,0) [0|3] "" XXX
  SG_ cr_vsm_deccmd : 38|8@1+ (1,0) [0|255] "" XXX
  SG_ NEW_SIGNAL_2 : 47|1@1+ (1,0) [0|1] "" XXX
  SG_ cf_vsm_deccmdact : 48|7@1+ (1,-127) [0|15] "" XXX
@@ -513,7 +514,7 @@ BO_ 1057 SCC12: 8 XXX
  SG_ TauGapSet : 37|3@1+ (1,0) [0|7] "" CLU,ESC,TCU
  SG_ VSetDis : 41|8@1+ (1,0) [0|255] "km/h or MPH" CLU,ESC,TCU
  SG_ StopReq : 49|1@1+ (1,0) [0|1] "" EPB,ESC
- SG_ MainMode_Alt : 58|3@1+ (1,0) [0|7] "" CLU,HUD,LDWS_LKAS,ESC
+ SG_ ACC_ObjDist_Ref : 50|11@1+ (0.1,0) [0|204.7] "" CLU,HUD,LDWS_LKAS,ESC
 
 BO_ 1064 _4WD11: 8 XXX
  SG_ AUTO_ACT : 43|1@1+ (1,0) [0|0] "" XXX
