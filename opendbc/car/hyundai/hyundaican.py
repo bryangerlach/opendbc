@@ -230,11 +230,11 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       #"ACCMode_Inactive": 0 if enabled else 1,
       "ACCMode_Inactive": 0,
       "TauGapSet": hud_control.leadDistanceBars,
-      "VSetDis": set_speed if enabled else 0,
+      "VSetDis": set_speed if main_cruise_enabled else 0,
       "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
-      "ACC_ObjDist_Ref": int(lead_data.lead_distance), #this is maybe a filtered acc_objdist
+      "ACC_ObjDist_Ref": int(lead_data.lead_distance), #this is the cars desired distance
     }
 
   def get_scc14_values():
