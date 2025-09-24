@@ -221,6 +221,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
+      "ObjValid": int(lead_data.lead_visible),
     }
 
   def get_scc12_values():
