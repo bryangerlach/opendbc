@@ -211,9 +211,16 @@ def create_lfahda_mfc(packer, frame, CP, enabled, lfa_icon):
 
 def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
                                           hud_control, set_speed, stopping, long_override, use_fca, CP,
-                                          main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
+                                          main_cruise_enabled, tuning, CAN, v_ego, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
   bus = CAN.ECAN
+
+  STATIONARY_OFFSET_M = 4.5
+  GAP_MAP_S = {
+    1: 1.0,  # Close
+    2: 1.8,  # Medium
+    3: 2.5,  # Far
+  }
 
   def get_scc11_values():
     return {
@@ -225,6 +232,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
     }
 
   def get_scc12_values():
+    time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
+    desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
@@ -233,7 +242,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
-      "ACC_ObjDist_Ref": int(lead_data.lead_distance), #this is the cars desired distance
+      "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
     }
 
   def get_scc14_values():
