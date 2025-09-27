@@ -131,6 +131,86 @@ def create_lfahda_mfc(packer, enabled, lfa_icon):
   return packer.make_can_msg("LFAHDA_MFC", 0, values)
 
 
+def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
+                                          hud_control, set_speed, stopping, long_override, use_fca, CP,
+                                          main_cruise_enabled, tuning, CAN, v_ego, ESCC: EnhancedSmartCruiseControl = None):
+  commands = []
+  bus = CAN.ECAN
+
+  STATIONARY_OFFSET_M = 4.5
+  GAP_MAP_S = {
+    1: 1.0,  # Close
+    2: 1.8,  # Medium
+    3: 2.5,  # Far
+  }
+
+  def get_scc11_values():
+    return {
+      "aReqRaw": tuning.desired_accel,
+      "aReqValue": tuning.actual_accel,
+      "JerkUpperLimit": tuning.jerk_upper,
+      "JerkLowerLimit": tuning.jerk_lower,
+      "ObjValid": int(lead_data.lead_visible),
+    }
+
+  def get_scc12_values():
+    time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
+    desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
+    return {
+      "MainMode_ACC": 1 if main_cruise_enabled else 0,
+      "ACCMode_Inactive": 0 if enabled else 1,
+      "TauGapSet": hud_control.leadDistanceBars,
+      "VSetDis": set_speed if main_cruise_enabled else 0,
+      "ACC_ObjDist": int(lead_data.lead_distance),
+      "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
+      "StopReq": 1 if tuning.stopping else 0,
+      "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
+    }
+
+  def get_scc14_values():
+    return {
+      "ACC_ObjRelSpd": lead_data.lead_rel_speed,
+      "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
+      "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
+    }
+
+  def get_fca11_values():
+    return {
+      "cr_vsm_deccmd": 255,
+      "cf_vsm_deccmdact": 127,
+    }
+
+  def calculate_checksum(addr, values):
+    values["COUNTER"] = idx % 0xF
+    checksum = create_checksum_can_canfd_blended(packer, bus, addr, values)
+    values["CHECKSUM"] = checksum
+    return values
+
+  scc11_values = get_scc11_values()
+  scc11_values = calculate_checksum("SCC11", scc11_values)
+  commands.append(packer.make_can_msg("SCC11", bus, scc11_values))
+
+  scc12_values = get_scc12_values()
+  scc12_values = calculate_checksum("SCC12", scc12_values)
+  commands.append(packer.make_can_msg("SCC12", bus, scc12_values))
+
+  scc14_values = get_scc14_values()
+  scc14_values = calculate_checksum("SCC14", scc14_values)
+  commands.append(packer.make_can_msg("SCC14", bus, scc14_values))
+
+  # Only send FCA11 on cars where it exists on the bus
+  # On Camera SCC cars, FCA11 is not disabled, so we forward stock FCA11 back to the car forward hooks
+  # If we don't use ESCC since ESCC does not block FCA11 from stock radar
+  if use_fca and not ((CP.flags & HyundaiFlags.CAMERA_SCC) or (ESCC and ESCC.enabled)):
+    # note that some vehicles most likely have an alternate checksum/counter definition
+    # https://github.com/commaai/opendbc/commit/9ddcdb22c4929baf310295e832668e6e7fcfa602
+    fca11_values = get_fca11_values()
+    fca11_values = calculate_checksum("FCA11", fca11_values)
+    commands.append(packer.make_can_msg("FCA11", bus, fca11_values))
+
+  return commands
+
+
 def create_acc_commands(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
                         hud_control, set_speed, stopping, long_override, use_fca, CP,
                         main_cruise_enabled, tuning, ESCC: EnhancedSmartCruiseControl = None):
@@ -266,3 +346,10 @@ def create_frt_radar_opt(packer):
     "CF_FCA_Equip_Front_Radar": 1,
   }
   return packer.make_can_msg("FRT_RADAR11", 0, frt_radar11_values)
+
+def create_checksum_can_canfd_blended(packer, CAN, addr, values):
+  dat = packer.make_can_msg(addr, CAN.ECAN, values)[1]
+  dat = dat[1:8]
+  checksum = hyundai_checksum(dat)
+
+  return checksum

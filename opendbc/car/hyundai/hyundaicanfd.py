@@ -200,54 +200,6 @@ def create_acc_control(packer, CAN, enabled, accel_last, accel, stopping, gas_ov
 
   return packer.make_can_msg("SCC_CONTROL", CAN.ECAN, values)
 
-def create_acc_commands_can_canfd_blended(packer, CAN, enabled, accel, accel_last, upper_jerk, idx, lead_visible, set_speed, stopping, long_override, hud_control):
-  jerk = 5
-  jn = jerk / 50
-  if not enabled or long_override:
-    a_val, a_raw = 0, 0
-  else:
-    a_raw = accel
-    a_val = np.clip(accel, accel_last - jn, accel_last + jn)
-  ret = []
-
-  msg_values = [
-    ("SCC11", {
-      "aReqRaw": a_raw,
-      "aReqValue": a_val,
-      "JerkUpperLimit": upper_jerk,
-      "JerkLowerLimit": jerk if enabled else 1,
-    }),
-
-    ("SCC12", {
-      "MainMode_ACC": 1,
-      "ACCMode_Inactive": 0 if enabled else 1,
-      "TauGapSet": hud_control.leadDistanceBars,
-      "VSetDis": set_speed,
-      "ACC_ObjDist": 1,
-      "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
-      "StopReq": 1 if stopping else 0,
-    }),
-
-    ("SCC14", {
-      "ACC_ObjLatPos": 0,
-      "ObjValid": 0,
-      "ObjStatus": 0 if not lead_visible else 2 if lead_visible and enabled else 1,
-    }),
-
-    ("FCA11", {
-      "BYTE4": 0xC0,
-      "BYTE5": 0x3F,
-      "BYTE6": 0x7F,
-    }),
-  ]
-
-  for addr, values in msg_values:
-    values["COUNTER"] = idx % 0xF
-    checksum = create_checksum_can_canfd_blended(packer, CAN, addr, values)
-    values["CHECKSUM"] = checksum
-    ret.append(packer.make_can_msg(addr, CAN.ECAN, values))
-
-  return ret
 
 def create_spas_messages(packer, CAN, left_blink, right_blink):
   ret = []
