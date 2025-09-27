@@ -211,10 +211,18 @@ def create_lfahda_mfc(packer, frame, CP, enabled, lfa_icon):
 
   return packer.make_can_msg("LFAHDA_MFC", bus, values)
 
-def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, hud_control, set_speed, stopping, long_override, use_fca, CP,
-                        main_cruise_enabled, tuning, CAN, ESCC: EnhancedSmartCruiseControl = None):
+def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
+                                          hud_control, set_speed, stopping, long_override, use_fca, CP,
+                                          main_cruise_enabled, tuning, CAN, v_ego, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
   bus = CAN.ECAN
+
+  STATIONARY_OFFSET_M = 4.5
+  GAP_MAP_S = {
+    1: 1.0,  # Close
+    2: 1.8,  # Medium
+    3: 2.5,  # Far
+  }
 
   def get_scc11_values():
     return {
@@ -222,31 +230,34 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
+      "ObjValid": int(lead_data.lead_visible),
     }
 
   def get_scc12_values():
+    time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
+    desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
-      "VSetDis": set_speed if enabled else 0,
-      "ACC_ObjDist": 1,
+      "VSetDis": set_speed if main_cruise_enabled else 0,
+      "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
-      "StopReq": 1 if stopping else 0,
+      "StopReq": 1 if tuning.stopping else 0,
+      "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
     }
 
   def get_scc14_values():
     return {
-      "ACC_ObjLatPos": 0,
-      "ObjValid": 1,
-      "ObjStatus": 0 if not hud_control.leadVisible else 2 if hud_control.leadVisible and enabled else 1,
+      "ACC_ObjRelSpd": lead_data.lead_rel_speed,
+      "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
+      "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
     }
 
   def get_fca11_values():
     return {
-      "BYTE4": 0xC0,
-      "BYTE5": 0x3F,
-      "BYTE6": 0x7F,
+      "cr_vsm_deccmd": 255,
+      "cf_vsm_deccmdact": 127,
     }
 
   def calculate_checksum(addr, values):
