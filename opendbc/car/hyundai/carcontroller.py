@@ -178,7 +178,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
         can_sends.extend(hyundaican.create_acc_commands_can_canfd_blended(self.packer, CC.enabled, accel, jerk, int(self.frame / 2),
                                                       hud_control, set_speed_in_units, stopping,
                                                       CC.cruiseControl.override, use_fca, self.CP,
-                                                      CS.main_cruise_enabled, self.tuning, self.CAN, self.ESCC))
+                                                      CS.main_cruise_enabled, self.tuning, self.CAN, CS.out.vEgo, self.ESCC))
       else:
         can_sends.extend(hyundaican.create_acc_commands(self.packer, CC.enabled, accel, jerk, int(self.frame / 2),
                                                       self.lead_data, hud_control, set_speed_in_units, stopping,
