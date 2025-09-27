@@ -220,10 +220,12 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       if self.frame % 2 == 0:
         if can_canfd_blended:
           stopping = stopping and CS.out.vEgoRaw < 0.1
-          upper_jerk = 3.0 if actuators.longControlState == LongCtrlState.pid else 1.0
-          can_sends.extend(hyundaicanfd.create_acc_commands_can_canfd_blended(self.packer, self.CAN, CC.enabled, accel, self.accel_last, upper_jerk,
-                                                                              int(self.frame / 2), hud_control.leadVisible,
-                                                                              set_speed_in_units, stopping, CC.cruiseControl.override, hud_control))
+          jerk = 3.0 if actuators.longControlState == LongCtrlState.pid else 1.0
+          use_fca = self.CP.flags & HyundaiFlags.USE_FCA.value
+          can_sends.extend(hyundaican.create_acc_commands_can_canfd_blended(self.packer, CC.enabled, accel, jerk, int(self.frame / 2),
+                                                      self.lead_data, hud_control, set_speed_in_units, stopping,
+                                                      CC.cruiseControl.override, use_fca, self.CP,
+                                                      CS.main_cruise_enabled, self.tuning, self.CAN, CS.out.vEgo, self.ESCC))
         else:
           can_sends.append(hyundaicanfd.create_acc_control(self.packer, self.CAN, CC.enabled, self.accel_last, accel, stopping, CC.cruiseControl.override,
                                                          set_speed_in_units, hud_control, self.lead_data, CS.main_cruise_enabled, self.tuning))
