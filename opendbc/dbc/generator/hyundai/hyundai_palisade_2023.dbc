@@ -198,10 +198,17 @@ BO_ 683 ESCC: 8 XXX
  SG_ CR_VSM_DecCmd_SCC12 : 8|8@1+ (0.01,0) [0|2.55] "g" ESC
  SG_ ObjValid : 16|1@1+ (1,0) [0|1] "" CLU,ESC,TCU
  SG_ ACC_ObjStatus : 17|2@1+ (1,0) [0|3] "" ABS,ESC
- SG_ ESCC_WD_Fail_Count : 21|3@1+ (1,0) [0|15] "" XXX
  SG_ ACC_ObjRelSpd : 40|9@1+ (0.1,-16.4) [0|0] "m/s" ABS,ESC
  SG_ ACC_ObjDist : 24|11@1+ (0.1,0) [0|204.7] "m" ABS,ESC
  SG_ CR_VSM_DecCmd_FCA11 : 56|8@1+ (0.01,0) [0|2.55] "g" ESC
+
+BO_ 2016 ESCC_DEBUG: 8 XXX
+ SG_ safety_mode : 0|8@1+ (1,0) [0|255] "" XXX
+ SG_ watchdog_fails : 8|8@1+ (1,0) [0|255] "" XXX
+ SG_ fwd_hook_count : 16|16@1+ (1,0) [0|255] "" XXX
+ SG_ fifo_overrun : 32|8@1+ (1,0) [0|255] "" XXX
+ SG_ fifo_overrun_count : 40|8@1+ (1,0) [0|255] "" XXX
+ SG_ can3_queue : 48|16@1+ (1,0) [0|255] "" XXX
 
 BO_ 688 SAS11: 5 XXX
  SG_ CheckSum : 36|4@1+ (1,0) [0|0] "" XXX
@@ -717,13 +724,12 @@ BO_ 1322 CLU15: 8 XXX
 
 BO_ 1342 LKAS12: 8 XXX
  SG_ CF_LkasDawStatus : 40|3@1+ (1,0) [0|0] "" XXX
- SG_ CF_LkasTsrSpeed_Display_Navi : 24|8@1+ (1,0) [0|0] "" XXX
- SG_ CF_Lkas_Daw_USM : 37|3@1+ (1,0) [0|0] "" XXX
- SG_ CF_Lkas_TsrAddinfo_Display : 32|2@1+ (1,0) [0|0] "" XXX
+ SG_ CF_LkasTsrSpeed_Display_Navi : 32|8@1+ (1,0) [0|0] "" XXX
+ SG_ CF_Lkas_TsrSpeed_Display_Clu : 24|8@1+ (1,0) [0|0] "" XXX
  SG_ CF_Lkas_TsrSlifOpt : 10|2@1+ (1,0) [0|0] "" XXX
- SG_ CF_Lkas_TsrSpeed_Display_Clu : 16|8@1+ (1,0) [0|0] "" XXX
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|0] "" XXX
  SG_ COUNTER : 12|4@1+ (1,0) [0|0] "" XXX
+ SG_ road_sign_detected : 56|8@1+ (1,0) [0|255] "" XXX
 
 BO_ 1345 CGW1: 8 XXX
  SG_ CF_Gway_ALightStat : 37|1@1+ (1,0) [0|0] "" XXX
@@ -902,3 +908,4 @@ VAL_ 1157 LFA_SysWarning 0 "no_message" 1 "switching_to_hda" 2 "switching_to_scc
 VAL_ 1157 LFA_Icon_State 0 "no_wheel" 1 "white_wheel" 2 "green_wheel" 3 "green_wheel_blink";
 VAL_ 1157 HDA_SysWarning 0 "no_message" 1 "driving_convenience_systems_cancelled" 2 "highway_drive_assist_system_cancelled";
 VAL_ 1322 CF_Clu_Gear 1 "P" 2 "R" 4 "N" 8 "D";
+VAL_ 1342 road_sign_detected 1 "Slow/Caution" 8 "Stop" 9 "Yield"
