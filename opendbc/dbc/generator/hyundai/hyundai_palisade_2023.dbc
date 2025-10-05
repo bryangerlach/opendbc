@@ -210,6 +210,28 @@ BO_ 2016 ESCC_DEBUG: 8 XXX
  SG_ fifo_overrun_count : 40|8@1+ (1,0) [0|255] "" XXX
  SG_ can3_queue : 48|16@1+ (1,0) [0|255] "" XXX
 
+BO_ 2017 ESCC_DEBUG2: 8 XXX
+ SG_ CAN1_TSR : 0|32@1+ (1,0) [0|4294967295] "" XXX
+ SG_ CAN3_TSR : 32|32@1+ (1,0) [0|4294967295] "" XXX
+ SG_ CAN1_TME0 : 26|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TME1 : 27|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TME2 : 28|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_ALST0 : 2|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_ALST1 : 10|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_ALST2 : 18|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TERR0 : 1|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TERR1 : 9|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TERR2 : 17|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TME0 : 58|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TME1 : 59|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TME2 : 60|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_ALST0 : 34|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_ALST1 : 42|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_ALST2 : 50|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TERR0 : 33|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TERR1 : 41|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN3_TERR2 : 49|1@1+ (1,0) [0|1] "" XXX
+
 BO_ 688 SAS11: 5 XXX
  SG_ CheckSum : 36|4@1+ (1,0) [0|0] "" XXX
  SG_ MsgCount : 32|4@1+ (1,0) [0|0] "" XXX
@@ -729,7 +751,10 @@ BO_ 1342 LKAS12: 8 XXX
  SG_ CF_Lkas_TsrSlifOpt : 10|2@1+ (1,0) [0|0] "" XXX
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|0] "" XXX
  SG_ COUNTER : 12|4@1+ (1,0) [0|0] "" XXX
- SG_ road_sign_detected : 56|8@1+ (1,0) [0|255] "" XXX
+ SG_ CF_SLA_Avail : 48|2@1+ (1,0) [0|3] "" XXX
+ SG_ CF_SLA_AdjDisp : 51|2@1+ (1,0) [0|3] "" XXX
+ SG_ Sign_detected : 56|5@1+ (1,0) [0|255] "" XXX
+ SG_ CF_SLA_ACT : 61|1@0+ (1,0) [0|1] "" XXX
 
 BO_ 1345 CGW1: 8 XXX
  SG_ CF_Gway_ALightStat : 37|1@1+ (1,0) [0|0] "" XXX
