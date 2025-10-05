@@ -220,15 +220,17 @@ BO_ 2017 ESCC_DEBUG2: 8 XXX
  SG_ CAN1_TERR0 : 1|1@1+ (1,0) [0|1] "" XXX
  SG_ CAN1_TERR1 : 9|1@1+ (1,0) [0|1] "" XXX
  SG_ CAN1_TERR2 : 17|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TME0 : 58|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TME1 : 59|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TME2 : 60|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_ALST0 : 34|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_ALST1 : 42|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_ALST2 : 50|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TERR0 : 33|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TERR1 : 41|1@1+ (1,0) [0|1] "" XXX
- SG_ CAN3_TERR2 : 49|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_RQCP0 : 0|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_RQCP1 : 8|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_RQCP2 : 16|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_TX_ERR_CNT : 32|8@1+ (1,0) [0|255] "" XXX
+ SG_ CAN1_RX_ERR_CNT : 40|8@1+ (1,0) [0|255] "" XXX
+ SG_ CAN1_EWGF : 48|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_EPVF : 49|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_BOFF : 50|1@1+ (1,0) [0|1] "" XXX
+ SG_ CAN1_LEC : 56|3@1+ (1,0) [0|7] "" XXX
+
+VAL_ 2017 CAN1_LEC 0 "No Error" 1 "Stuff Error" 2 "Form Error" 3 "Ack Error" 4 "Bit Recessive Error" 5 "Bit Dominant Error" 6 "CRC Error" 7 "Set by Software" ;
 
 BO_ 688 SAS11: 5 XXX
  SG_ CheckSum : 36|4@1+ (1,0) [0|0] "" XXX
