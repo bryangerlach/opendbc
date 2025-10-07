@@ -228,7 +228,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-      "ObjValid": int(lead_data.lead_visible),
+      "ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
+      "ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
     }
 
   def get_scc12_values():
@@ -248,8 +249,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   def get_scc14_values():
     return {
       "ACC_ObjRelSpd": lead_data.lead_rel_speed,
-      "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
-      "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
+      "ObjValid": 0 if int(lead_data.lead_visible) == 1 else 1,
+      "ObjStatus": 2 if enabled and int(lead_data.lead_visible) == 1 else 1 if enabled else 0,
     }
 
   def get_fca11_values():
