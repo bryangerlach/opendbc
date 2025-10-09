@@ -215,7 +215,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   commands = []
   bus = CAN.ECAN
 
-  STATIONARY_OFFSET_M = 4.5
+  STATIONARY_OFFSET_M = 4.0
   GAP_MAP_S = {
     1: 1.0,  # Close
     2: 1.8,  # Medium
