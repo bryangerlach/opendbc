@@ -124,7 +124,7 @@ class CarInterface(CarInterfaceBase):
     # Common lateral control setup
 
     ret.centerToFront = ret.wheelbase * 0.4
-    ret.steerActuatorDelay = 2.5 if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0.1
+    ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 0.4
     CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
