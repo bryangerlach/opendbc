@@ -11,8 +11,10 @@ from enum import IntFlag
 class ToyotaFlagsSP(IntFlag):
   SMART_DSU = 1
   RADAR_CAN_FILTER = 2
+  ZSS = 4
 
 
 class ToyotaSafetyFlagsSP:
   DEFAULT = 0
   UNSUPPORTED_DSU = 1
+  GAS_INTERCEPTOR = 2
