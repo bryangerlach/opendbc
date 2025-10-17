@@ -166,7 +166,7 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
   return [packer.make_can_msg(msg, bus, data) for msg, data in [("LKAS11", values), ("ALERTS_364", msg_364)]]
 
 
-def create_clu11(packer, frame, clu11, button, CP, CAN):
+def create_clu11(packer, frame, clu11, button, CP):
   values = {s: clu11[s] for s in [
     "CF_Clu_CruiseSwState",
     "CF_Clu_CruiseSwMain",
@@ -187,7 +187,7 @@ def create_clu11(packer, frame, clu11, button, CP, CAN):
   if CP.flags & HyundaiFlags.CAMERA_SCC:  # send buttons to camera on camera-scc based cars
     bus = 2
   elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-    bus = CAN.ECAN
+    bus = CanBus(CP).ECAN
   else:
     bus = 0
   return packer.make_can_msg("CLU11", bus, values)
