@@ -250,8 +250,13 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
     }
   }
 
-  if (msg->addr == 0x421U) {
+  if (msg->addr == 0x421U && hyundai_can_canfd_blended) {
     acc_main_on_tx = GET_BIT(msg, 27U);
+    hyundai_common_acc_main_on_sync();
+  }
+
+  if (msg->addr == 0x420U && !hyundai_can_canfd_blended) {
+    acc_main_on_tx = GET_BIT(msg, 0U);
     hyundai_common_acc_main_on_sync();
   }
 
