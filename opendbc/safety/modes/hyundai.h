@@ -336,7 +336,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
     HYUNDAI_COMMON_TX_MSGS(0, true)
-    {0x364, 0, 8, .check_relay = true}, /* ALERTS_364*/ \
+    {0x364, 0, 8, .check_relay = false}, /* ALERTS_364*/ \
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
@@ -416,7 +416,7 @@ static safety_config hyundai_init(uint16_t param) {
   } else if (hyundai_camera_scc) {
     static RxCheck hyundai_cam_scc_rx_checks[] = {
       HYUNDAI_COMMON_RX_CHECKS(false)
-      HYUNDAI_SCC12_ADDR_CHECK(2,false)
+      HYUNDAI_SCC12_ADDR_CHECK(2, false)
       HYUNDAI_SCC11_ADDR_CHECK(2)
       HYUNDAI_LDA_BUTTON_ADDR_CHECK
     };
