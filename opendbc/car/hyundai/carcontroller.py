@@ -219,7 +219,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     if self.CP.openpilotLongitudinalControl:
       if lka_steering:
         can_sends.extend(hyundaicanfd.create_adrv_messages(self.packer, self.CAN, self.frame, can_canfd_blended))
-        if can_canfd_blended:
+        if can_canfd_blended and not self.ESCC.enabled:
           can_sends.extend(hyundaicanfd.create_radar_aux_messages(self.packer, self.CAN, self.frame))
       else:
         can_sends.extend(hyundaicanfd.create_fca_warning_light(self.packer, self.CAN, self.frame))

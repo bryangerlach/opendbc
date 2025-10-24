@@ -530,8 +530,8 @@ BO_ 1056 SCC11: 8 XXX
  SG_ aReqRaw : 27|11@1+ (0.01,-10.23) [-10.23|10.24] "m/s^2" Vector__XXX
  SG_ JerkUpperLimit : 38|7@1+ (0.1,0) [0|12.7] "m/s^3" ESC
  SG_ JerkLowerLimit : 45|7@1+ (0.1,0) [0|12.7] "m/s^3" ESC
- SG_ ComfortBandUpper : 52|6@1+ (1,0) (0.02,0) [0|1.26] "m/s^2" ESC
- SG_ ComfortBandLower : 58|6@1+ (1,0) (0.02,0) [0|1.26] "m/s^2" ESC
+ SG_ ComfortBandUpper : 52|6@1+ (0.02,0) [0|1.26] "m/s^2" ESC
+ SG_ ComfortBandLower : 58|6@1+ (0.02,0) [0|1.26] "m/s^2" ESC
 
 BO_ 1057 SCC12: 8 XXX
  SG_ ACCMode : 28|2@1+ (1,0) [0|3] "" CLU,HUD,LDWS_LKAS,ESC
