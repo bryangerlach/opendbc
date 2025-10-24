@@ -184,6 +184,7 @@ class CarState(CarStateBase, CarStateExt):
       self.pcm_follow_distance = cp.vl["PCM_CRUISE_2"]["PCM_FOLLOW_DISTANCE"]
 
     buttonEvents = []
+    prev_distance_button = self.distance_button
     if self.CP.carFingerprint in TSS2_CAR:
       # lkas button is wired to the camera
       prev_lkas_button = self.lkas_button
@@ -194,18 +195,19 @@ class CarState(CarStateBase, CarStateExt):
         buttonEvents.extend(create_button_events(1, 0, {1: ButtonType.lkas}) +
                             create_button_events(0, 1, {1: ButtonType.lkas}))
 
-      if self.CP.carFingerprint not in RADAR_ACC_CAR or (self.CP_SP.flags & ToyotaFlagsSP.SMART_DSU and not self.CP_SP.flags & ToyotaFlagsSP.RADAR_CAN_FILTER):
+      if self.CP.carFingerprint not in RADAR_ACC_CAR:
         # distance button is wired to the ACC module (camera or radar)
-        prev_distance_button = self.distance_button
-        if self.CP.carFingerprint not in RADAR_ACC_CAR:
-          self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
-        else:
-          self.distance_button = cp.vl["SDSU"]["FD_BUTTON"]
+        self.distance_button = cp_acc.vl["ACC_CONTROL"]["DISTANCE"]
 
         buttonEvents += create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
+    elif self.CP_SP.flags & ToyotaFlagsSP.SMART_DSU and not self.CP_SP.flags & ToyotaFlagsSP.RADAR_CAN_FILTER:
+      self.distance_button = cp.vl["SDSU"]["FD_BUTTON"]
+
+      buttonEvents += create_button_events(self.distance_button, prev_distance_button, {1: ButtonType.gapAdjustCruise})
+
     ret.buttonEvents = buttonEvents
 
-    CarStateExt.update(self, ret, can_parsers)
+    CarStateExt.update(self, ret, ret_sp, can_parsers)
 
     return ret, ret_sp
 
@@ -215,7 +217,12 @@ class CarState(CarStateBase, CarStateExt):
       ("BLINKERS_STATE", float('nan')),
     ]
 
+    cam_messages = [
+      ("RSA1", 0),
+      ("RSA2", 0),
+    ]
+
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, 0),
-      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [], 2),
+      Bus.cam: CANParser(DBC[CP.carFingerprint][Bus.pt], [] + cam_messages, 2),
     }
