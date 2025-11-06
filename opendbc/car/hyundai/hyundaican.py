@@ -239,7 +239,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
       "TauGapSet": hud_control.leadDistanceBars,
-      "VSetDis": set_speed if main_cruise_enabled and set_speed != 158 else 0,
+      "VSetDis": set_speed if main_cruise_enabled else 0,
       "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
