@@ -183,7 +183,8 @@ class CarInterface(CarInterfaceBase):
     if not stock_cp.flags & HyundaiFlags.CANFD:
       # TODO-SP: add route with ESCC message for process replay
       if ESCC_MSG in fingerprint[0]:
-        ret.flags |= HyundaiFlagsSP.ENHANCED_SCC.value
+        if not stock_cp.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+          ret.flags |= HyundaiFlagsSP.ENHANCED_SCC.value
 
     if ret.flags & HyundaiFlagsSP.ENHANCED_SCC:
       ret.safetyParam |= HyundaiSafetyFlagsSP.ESCC
