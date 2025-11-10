@@ -40,7 +40,7 @@ class CanBus(CanBusBase):
 
 def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
                             frame, torque_fault, left_lane, right_lane,
-                            left_lane_depart, right_lane_depart, lkas_icon):
+                            left_lane_depart, right_lane_depart, lkas_icon, vEgo):
   common_values = {
     "LKA_MODE": 2,
     "LKA_ICON": lkas_icon,
@@ -48,7 +48,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     "LKA_ASSIST": 0,
     "STEER_REQ": 1 if lat_active else 0,
     "HAS_LANE_SAFETY": 0,  # hide LKAS settings
-    "DAMP_FACTOR": 100,  # can potentially tuned for better perf [3, 200]
+    "DAMP_FACTOR": 100 if vEgo < 65 else 85,  # can potentially tuned for better perf [3, 200]
   }
 
   lkas_values = copy.copy(common_values)
@@ -65,7 +65,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
         ret.append(create_lkas11_can_canfd_blended(packer, CAN, frame, apply_torque, lat_active,
                                                   torque_fault, enabled,
                                                   left_lane, right_lane,
-                                                  left_lane_depart, right_lane_depart))
+                                                  left_lane_depart, right_lane_depart, vEgo))
       else:
         ret.append(packer.make_can_msg("LFA", CAN.ECAN, lfa_values))
     ret.append(packer.make_can_msg(lkas_msg, CAN.ACAN, lkas_values))
@@ -90,7 +90,7 @@ def create_suppress_lfa(packer, CAN, lfa_block_msg, lka_steering_alt):
 def create_lkas11_can_canfd_blended(packer, CAN, frame, apply_steer, steer_req,
                                    torque_fault, enabled,
                                    left_lane, right_lane,
-                                   left_lane_depart, right_lane_depart):
+                                   left_lane_depart, right_lane_depart, vEgo):
 
   values = {
     "CF_Lkas_LdwsLHWarning": left_lane_depart,
@@ -102,7 +102,7 @@ def create_lkas11_can_canfd_blended(packer, CAN, frame, apply_steer, steer_req,
     "CF_Lkas_FcwOpt_USM": 2 if enabled else 1,
     "CF_Lkas_LdwsActivemode": int(left_lane) + (int(right_lane) << 1),
     "NEW_SIGNAL_1": 0,
-    "NEW_SIGNAL_5": 100,
+    "NEW_SIGNAL_5": 100 if vEgo < 65 else 133,
   }
 
   checksum = create_checksum_can_canfd_blended(packer, CAN, "LKAS11", values)
