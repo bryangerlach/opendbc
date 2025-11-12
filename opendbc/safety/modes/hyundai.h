@@ -336,7 +336,7 @@ static safety_config hyundai_init(uint16_t param) {
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_TX_MSGS[] = {
     HYUNDAI_COMMON_TX_MSGS(0, true)
-    {0x364, 0, 8, .check_relay = false}, /* ALERTS_364*/ \
+    {0x364, 0, 8, .check_relay = true}, /* ALERTS_364*/ \
   };
 
   static const CanMsg HYUNDAI_CAN_CANFD_BLENDED_LONG_TX_MSGS[] = {
@@ -363,7 +363,6 @@ static safety_config hyundai_init(uint16_t param) {
 
   if (hyundai_can_canfd_blended) {
     gen_crc_lookup_table_16(0x1021, hyundai_canfd_crc_lut);
-    //hyundai_longitudinal = false;
   }
 
 
