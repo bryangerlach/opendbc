@@ -108,7 +108,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     can_canfd_blended = bool(self.CP.flags & HyundaiFlags.CAN_CANFD_BLENDED)
 
     # tester present - w/ no response (keeps relevant ECU disabled)
-    if self.frame % 100 == 0 and not ((self.CP.flags & HyundaiFlags.CANFD_CAMERA_SCC) or self.ESCC.enabled) and \
+    if self.frame % 100 == 0 and not ((self.CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC)) or self.ESCC.enabled) and \
             self.CP.openpilotLongitudinalControl:
       # for longitudinal control, either radar or ADAS driving ECU
       addr, bus = 0x7d0, self.CAN.ECAN if (self.CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED)) else 0
@@ -162,16 +162,16 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     # Button messages
     if not self.CP.openpilotLongitudinalControl:
       if CC.cruiseControl.cancel:
-        can_sends.append(hyundaican.create_clu11(self.packer, self.frame, CS.clu11, Buttons.CANCEL, self.CP, self.CAN))
+        can_sends.append(hyundaican.create_clu11(self.packer, self.frame, CS.clu11, Buttons.CANCEL, self.CP))
       elif CC.cruiseControl.resume:
         # send resume at a max freq of 10Hz
         if (self.frame - self.last_button_frame) * DT_CTRL > 0.1:
           # send 25 messages at a time to increases the likelihood of resume being accepted
-          can_sends.extend([hyundaican.create_clu11(self.packer, self.frame, CS.clu11, Buttons.RES_ACCEL, self.CP, self.CAN)] * 25)
+          can_sends.extend([hyundaican.create_clu11(self.packer, self.frame, CS.clu11, Buttons.RES_ACCEL, self.CP)] * 25)
           if (self.frame - self.last_button_frame) * DT_CTRL >= 0.15:
             self.last_button_frame = self.frame
 
-    if self.CP.openpilotLongitudinalControl and can_canfd_blended:
+    if self.CP.openpilotLongitudinalControl and can_canfd_blended and not self.ESCC.enabled:
       can_sends.extend(hyundaican.create_radar_aux_messages(self.packer, self.CAN, self.frame))
 
     if self.frame % 2 == 0 and self.CP.openpilotLongitudinalControl:
@@ -180,7 +180,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       use_fca = self.CP.flags & HyundaiFlags.USE_FCA.value
       if can_canfd_blended:
         can_sends.extend(hyundaican.create_acc_commands_can_canfd_blended(self.packer, CC.enabled, accel, jerk, int(self.frame / 2),
-                                                      hud_control, set_speed_in_units, stopping,
+                                                      self.lead_data, hud_control, set_speed_in_units, stopping,
                                                       CC.cruiseControl.override, use_fca, self.CP,
                                                       CS.main_cruise_enabled, self.tuning, self.CAN, CS.out.vEgo, self.ESCC))
       else:
@@ -196,7 +196,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
 
     # 5 Hz ACC options
     if self.frame % 20 == 0 and self.CP.openpilotLongitudinalControl and not can_canfd_blended:
-      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.ESCC))
+      can_sends.extend(hyundaican.create_acc_opt(self.packer, self.CP, self.CAN, self.ESCC))
 
     # 2 Hz front radar options
     if self.frame % 50 == 0 and self.CP.openpilotLongitudinalControl and not self.ESCC.enabled and not can_canfd_blended:

@@ -143,6 +143,9 @@ class CarInterface(CarInterfaceBase):
     ret.startAccel = 1.0
     ret.longitudinalActuatorDelay = 0.5
 
+    if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      ret.stoppingDecelRate = 0.4
+
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.LONG.value
     if ret.flags & HyundaiFlags.HYBRID:
@@ -239,10 +242,11 @@ class CarInterface(CarInterfaceBase):
 
     if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
-      addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & (HyundaiFlags.CANFD | HyundaiFlags.CAN_CANFD_BLENDED) else 0
+
+      addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
       if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
         addr, bus = 0x730, CanBus(CP).ECAN
-      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=communication_control, reset=((CP.flags & HyundaiFlags.CAN_CANFD_BLENDED) and not (CP.flags & HyundaiFlags.CANFD_LKA_STEERING)))
+      disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=communication_control,reset=(CP.flags & HyundaiFlags.CAN_CANFD_BLENDED))
 
     # for blinkers
     if CP.flags & HyundaiFlags.ENABLE_BLINKERS:

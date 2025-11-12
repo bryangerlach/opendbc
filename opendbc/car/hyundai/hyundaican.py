@@ -155,10 +155,7 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
   values["CF_Lkas_Chksum"] = checksum
 
   #msg_364 contains the driver attention warning status level and alert.
-  if msg_364["DAW_Warning"] == 1:
-    msg_364["DAW_Warning"] = 0
-  if msg_364["DAW_Status"] < 5:
-    msg_364["DAW_Status"] = 5
+  msg_364["DAW_Warning"] = 0
 
   msg_364["COUNTER"] = frame % 0xF
   dat = packer.make_can_msg("ALERTS_364", bus, msg_364)[1]
@@ -168,7 +165,7 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
   return [packer.make_can_msg(msg, bus, data) for msg, data in [("LKAS11", values), ("ALERTS_364", msg_364)]]
 
 
-def create_clu11(packer, frame, clu11, button, CP, CAN):
+def create_clu11(packer, frame, clu11, button, CP):
   values = {s: clu11[s] for s in [
     "CF_Clu_CruiseSwState",
     "CF_Clu_CruiseSwMain",
@@ -189,7 +186,7 @@ def create_clu11(packer, frame, clu11, button, CP, CAN):
   if CP.flags & HyundaiFlags.CAMERA_SCC:  # send buttons to camera on camera-scc based cars
     bus = 2
   elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-    bus = CAN.ECAN
+    bus = CanBus(CP).ECAN
   else:
     bus = 0
   return packer.make_can_msg("CLU11", bus, values)
@@ -217,12 +214,12 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   commands = []
   bus = CAN.ECAN
 
-  STATIONARY_OFFSET_M = 4.5
-  GAP_MAP_S = {
-    1: 1.0,  # Close
-    2: 1.8,  # Medium
-    3: 2.5,  # Far
-  }
+  # STATIONARY_OFFSET_M = 4.0
+  # GAP_MAP_S = {
+  #   1: 1.0,  # Close
+  #   2: 1.8,  # Medium
+  #   3: 2.5,  # Far
+  # }
 
   def get_scc11_values():
     return {
@@ -230,12 +227,13 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-      "ObjValid": int(lead_data.lead_visible),
+      "ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
+      "ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
     }
 
   def get_scc12_values():
-    time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
-    desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
+    # time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
+    # desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
@@ -244,14 +242,14 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACC_ObjDist": int(lead_data.lead_distance),
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
-      "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
+      # "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
     }
 
   def get_scc14_values():
     return {
       "ACC_ObjRelSpd": lead_data.lead_rel_speed,
-      "ObjValid": int(lead_data.lead_visible), # close lead makes controls tighter
-      "ObjStatus": int(lead_data.lead_visible), # close lead makes controls tighter
+      "ObjValid": 0 if int(lead_data.lead_visible) == 1 else 1,
+      "ObjStatus": 2 if enabled and int(lead_data.lead_visible) == 1 else 1 if enabled else 0,
     }
 
   def get_fca11_values():
@@ -382,8 +380,7 @@ def create_acc_commands(packer, enabled, accel, upper_jerk, idx, lead_data: CanL
 
   return commands
 
-
-def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
+def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
   """
     Creates SCC13 and FCA12. If ESCC is enabled, it will only create SCC13 since ESCC does not block FCA12.
     :param packer:
@@ -407,7 +404,7 @@ def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
   commands = []
 
   scc13_values = get_scc13_values()
-  commands.append(packer.make_can_msg("SCC13", 0, scc13_values))
+  commands.append(packer.make_can_msg("SCC13", CAN.ECAN, scc13_values))
 
   # If ESCC is available and enabled, we skip FCA12, since ESCC does not block FCA12
   if ESCC and ESCC.enabled:
@@ -417,10 +414,9 @@ def create_acc_opt(packer, CP, ESCC: EnhancedSmartCruiseControl = None):
   # On Camera SCC cars, FCA12 is not disabled, so we forward stock FCA12 back to the car forward hooks
   if not (CP.flags & HyundaiFlags.CAMERA_SCC):
     fca12_values = get_fca12_values()
-    commands.append(packer.make_can_msg("FCA12", 0, fca12_values))
+    commands.append(packer.make_can_msg("FCA12", CAN.ECAN, fca12_values))
 
   return commands
-
 
 def create_frt_radar_opt(packer):
   frt_radar11_values = {
@@ -437,7 +433,7 @@ def create_radar_aux_messages(packer, CAN, frame):
     }),
     ("RADAR_0x398", 5,  {
       "BYTE4": 0x80,
-      "BYTE5": 0x5D,
+      "BYTE5": 0x10,
     }),
   ]
 
