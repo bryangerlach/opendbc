@@ -310,11 +310,16 @@ BO_ 867 RADAR_0x363: 8 XXX
  SG_ BYTE6 : 48|8@1+ (1,0) [0|0] "" XXX
  SG_ BYTE7 : 56|8@1+ (1,0) [0|0] "" XXX
 
- BO_ 868 ALERTS_364: 8 XXX
+BO_ 868 ALERTS_364: 8 XXX
  SG_ CHECKSUM : 0|8@1+ (1,0) [0|0] "" XXX
  SG_ COUNTER : 12|4@1+ (1,0) [0|0] "" XXX
+ SG_ BYTE2 : 16|8@1+ (1,0) [0|255] "" XXX
+ SG_ BYTE3 : 24|8@1+ (1,0) [0|255] "" XXX
  SG_ DAW_Status : 35|3@1+ (1,0) [0|0] "" XXX
  SG_ DAW_Warning : 39|1@1+ (1,0) [0|7] "" XXX
+ SG_ BYTE5 : 40|8@1+ (1,0) [0|255] "" XXX
+ SG_ BYTE6 : 48|8@1+ (1,0) [0|255] "" XXX
+ SG_ BYTE7 : 56|8@1+ (1,0) [0|255] "" XXX
 
 BO_ 870 EMS_366: 8 XXX
  SG_ N : 8|16@1+ (0.25,0) [0|0] "" XXX
@@ -919,6 +924,9 @@ CM_ SG_ 1123 DRV_MODE_PRIMARY_STATUS "Indicates the current drive mode selected 
 CM_ SG_ 1123 DRV_MODE_SECONDARY_STATUS "Indicates a secondary status modifier, often used in combination with PRIMARY to disambiguate ECO vs Snow. Status-only.";
 CM_ SG_ 1123 DRV_MODE_EXT_IND "Drive mode extension indicator (e.g. Snow Mode flag). Status-only signal.";
 CM_ SG_ 1348 SpeedLim_Nav_Clu "Speed limit displayed on Nav, Cluster and HUD";
+CM_ SG_ 1342 CF_SLA_ACT "Speed limit assist active flag";
+CM_ SG_ 1342 CF_SLA_AdjDisp "Display of the automatically adjusting speed message";
+CM_ SG_ 1342 CF_SLA_Avail "Up or Down arrow showing speed limit assist available";
 
 VAL_ 871 CF_Lvr_Gear 12 "T" 5 "D" 8 "S" 6 "N" 7 "R" 0 "P";
 VAL_ 871 AUTO_START_STOP_STATUS 3 "Off" 1 "On";
@@ -934,4 +942,4 @@ VAL_ 1157 LFA_SysWarning 0 "no_message" 1 "switching_to_hda" 2 "switching_to_scc
 VAL_ 1157 LFA_Icon_State 0 "no_wheel" 1 "white_wheel" 2 "green_wheel" 3 "green_wheel_blink";
 VAL_ 1157 HDA_SysWarning 0 "no_message" 1 "driving_convenience_systems_cancelled" 2 "highway_drive_assist_system_cancelled";
 VAL_ 1322 CF_Clu_Gear 1 "P" 2 "R" 4 "N" 8 "D";
-VAL_ 1342 road_sign_detected 1 "Slow/Caution" 8 "Stop" 9 "Yield"
+VAL_ 1342 Sign_detected 1 "Slow/Caution" 8 "Stop" 9 "Yield"

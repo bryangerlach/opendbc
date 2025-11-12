@@ -155,8 +155,7 @@ def create_lkas11_can_canfd_blended(packer, frame, CP, apply_steer, steer_req,
   values["CF_Lkas_Chksum"] = checksum
 
   #msg_364 contains the driver attention warning status level and alert.
-  if msg_364["DAW_Warning"] == 1:
-    msg_364["DAW_Warning"] = 0
+  msg_364["DAW_Warning"] = 0
 
   msg_364["COUNTER"] = frame % 0xF
   dat = packer.make_can_msg("ALERTS_364", bus, msg_364)[1]
