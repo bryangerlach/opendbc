@@ -234,10 +234,10 @@ class CarInterface(CarInterfaceBase):
         stock_cp.minSteerSpeed = 0.0
         stock_cp.flags &= ~HyundaiFlags.MIN_STEER_32_MPH.value
 
-      if 0x544 in fingerprint[0]:
+      if 0x544 in fingerprint[0] or stock_cp.flags & HyundaiFlags.CAN_CANFD_BLENDED:
         ret.flags |= HyundaiFlagsSP.SPEED_LIMIT_AVAILABLE.value
 
-      if 0x53E in fingerprint[2]:
+      if 0x53E in fingerprint[2] or stock_cp.flags & HyundaiFlags.CAN_CANFD_BLENDED:
         ret.flags |= HyundaiFlagsSP.HAS_LKAS12.value
 
     ret.intelligentCruiseButtonManagementAvailable = not (stock_cp.flags & HyundaiFlags.CANFD_ALT_BUTTONS)
