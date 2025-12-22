@@ -206,7 +206,7 @@ class LongitudinalController:
     # Predictive tuning uses calculated desired jerk directly
     # Dynamic tuning applies a ramped approach for smoother transitions
     if self.CP_SP.flags & HyundaiFlagsSP.LONG_TUNING_PREDICTIVE:
-      self.jerk_lower = desired_jerk_lower
+      self.jerk_lower = desired_jerk_lower * 0.95 #palisade 2023 testing a slightly lower jerk.
     else:
       self.jerk_lower = ramp_update(self.jerk_lower, dynamic_desired_lower_jerk)
 
