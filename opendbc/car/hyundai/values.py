@@ -601,6 +601,11 @@ class CAR(Platforms):
     CarSpecs(mass=2260, wheelbase=2.87, steerRatio=17.1),
     flags=HyundaiFlags.EV,
   )
+  GENESIS_G90_2ND_GEN = HyundaiCanFDPlatformConfig(
+    [HyundaiCarDocs("Genesis G90 2023", "All", car_parts=CarParts.common([CarHarness.hyundai_r]))],
+    CarSpecs(mass=2355, wheelbase=3.18, steerRatio=11.95),
+    flags=HyundaiFlags.CANFD_ALT_GEARS,
+  )
   GENESIS_G80 = HyundaiPlatformConfig(
     [HyundaiCarDocs("Genesis G80 2018-19", "All", car_parts=CarParts.common([CarHarness.hyundai_h]))],
     CarSpecs(mass=2060, wheelbase=3.01, steerRatio=16.5),
