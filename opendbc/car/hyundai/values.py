@@ -53,11 +53,11 @@ class CarControllerParams:
       self.STEER_DELTA_DOWN = 3
 
     elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      self.STEER_MAX = 384
+      self.STEER_MAX = 404 #original 384
       self.STEER_DRIVER_ALLOWANCE = 50
       self.STEER_THRESHOLD = 250
-      self.STEER_DELTA_UP = 2
-      self.STEER_DELTA_DOWN = 3
+      self.STEER_DELTA_UP = 4 #original 2
+      self.STEER_DELTA_DOWN = 7 #original 3
 
     # Default for most HKG
     else:
