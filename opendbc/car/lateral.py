@@ -143,8 +143,8 @@ def common_fault_avoidance(fault_condition: bool, request: bool, above_limit_fra
 
   # Once we cut the request bit, count additionally to max_mismatching_frames before setting the request bit high again.
   # Some brands do not respect our workaround without multiple messages on the bus, for example
-  if above_limit_frames > max_above_limit_frames:
-    request = False
+  # if above_limit_frames > max_above_limit_frames:
+  #   request = False
 
   if above_limit_frames >= max_above_limit_frames + max_mismatching_frames:
     above_limit_frames = 0
