@@ -292,7 +292,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
 def create_acc_commands(packer, enabled, accel, upper_jerk, idx, lead_data: CanLeadData,
                         hud_control, set_speed, stopping, long_override, use_fca, CP,
-                        main_cruise_enabled, tuning, ESCC: EnhancedSmartCruiseControl = None):
+                        main_cruise_enabled, tuning, ESCC: EnhancedSmartCruiseControl | None = None):
   commands = []
 
   def get_scc11_values():
@@ -380,7 +380,8 @@ def create_acc_commands(packer, enabled, accel, upper_jerk, idx, lead_data: CanL
 
   return commands
 
-def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl = None):
+
+def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl | None = None):
   """
     Creates SCC13 and FCA12. If ESCC is enabled, it will only create SCC13 since ESCC does not block FCA12.
     :param packer:
