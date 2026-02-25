@@ -181,7 +181,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       jerk = 3.0 if actuators.longControlState == LongCtrlState.pid else 1.0
       use_fca = self.CP.flags & HyundaiFlags.USE_FCA.value
       if can_canfd_blended:
-        stopping = stopping and CS.out.vEgoRaw < 0.6
+        #stopping = stopping and CS.out.vEgoRaw < 0.6
         can_sends.extend(hyundaican.create_acc_commands_can_canfd_blended(self.packer, CC.enabled, accel, jerk, int(self.frame / 2),
                                                       self.lead_data, hud_control, set_speed_in_units, stopping,
                                                       CC.cruiseControl.override, use_fca, self.CP,
