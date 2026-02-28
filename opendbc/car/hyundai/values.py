@@ -54,10 +54,10 @@ class CarControllerParams:
 
     elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       self.STEER_MAX = 404 #original 384
-      self.STEER_DRIVER_ALLOWANCE = 50
+      self.STEER_DRIVER_ALLOWANCE = 50  # CAN driver torque signal scaling
       self.STEER_THRESHOLD = 250
-      self.STEER_DELTA_UP = 2 #original 2
-      self.STEER_DELTA_DOWN = 3 #original 3
+      self.STEER_DELTA_UP = 2   # CAN FD rate limits
+      self.STEER_DELTA_DOWN = 3  # CAN FD rate limits
 
     # Default for most HKG
     else:
