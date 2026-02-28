@@ -145,8 +145,8 @@ class CarInterface(CarInterfaceBase):
     ret.startAccel = 1.0
     ret.longitudinalActuatorDelay = 0.5
 
-    if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      ret.stoppingDecelRate = 0.4
+    # if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+    #   ret.stoppingDecelRate = 0.4
 
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.LONG.value

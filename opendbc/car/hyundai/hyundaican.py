@@ -227,8 +227,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-      "ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
-      "ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
+      #"ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
+      #"ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
     }
 
   def get_scc12_values():
@@ -379,7 +379,6 @@ def create_acc_commands(packer, enabled, accel, upper_jerk, idx, lead_data: CanL
     commands.append(packer.make_can_msg("FCA11", 0, fca11_values))
 
   return commands
-
 
 def create_acc_opt(packer, CP, CAN, ESCC: EnhancedSmartCruiseControl | None = None):
   """

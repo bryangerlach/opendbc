@@ -327,18 +327,18 @@ class TestHyundaiLegacySafetyHEV(TestHyundaiSafety):
     return self.packer.make_can_msg_safety("E_EMS11", 0, values, fix_checksum=checksum)
 
 class TestHyundaiCanCanfdBlendedSafety(TestHyundaiSafety):
-  MAX_RATE_UP = 2
-  MAX_RATE_DOWN = 3
+  MAX_RATE_UP = 4
+  MAX_RATE_DOWN = 7
   DRIVER_TORQUE_ALLOWANCE = 250
 
   def setUp(self):
-    self.packer = CANPackerPanda("hyundai_palisade_2023_generated")
+    self.packer = CANPackerSafety("hyundai_palisade_2023_generated")
     self.safety = libsafety_py.libsafety
     self.safety.set_safety_hooks(CarParams.SafetyModel.hyundai, HyundaiSafetyFlags.CAN_CANFD_BLENDED)
     self.safety.init_tests()
 
   def _pcm_status_msg(self, enable):
-    values = {"ACCMode": enable, "CR_VSM_Alive": self.cnt_cruise % 16}
+    values = {"ACCMode": enable, "COUNTER": self.cnt_cruise % 16}
     self.__class__.cnt_cruise += 1
     return self.packer.make_can_msg_panda("SCC12", 0, values)
 
