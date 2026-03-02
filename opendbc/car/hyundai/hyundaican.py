@@ -243,6 +243,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
       # "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
+      "ACC_ObjDist_Ref": lead_data.object_gap, # 5: >30, m, 4: 25-30 m, 3: 20-25 m, 2: < 20 m, 0: no lead
     }
 
   def get_scc14_values():
