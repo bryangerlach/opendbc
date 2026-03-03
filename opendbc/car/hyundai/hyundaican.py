@@ -215,11 +215,12 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   bus = CAN.ECAN
 
   # STATIONARY_OFFSET_M = 4.0
-  # GAP_MAP_S = {
-  #   1: 1.0,  # Close
-  #   2: 1.8,  # Medium
-  #   3: 2.5,  # Far
-  # }
+  GAP_MAP_S = {
+    2: 10,  # Close
+    3: 30,  # Medium
+    4: 40,  # Far
+    5: 50,
+  }
 
   def get_scc11_values():
     return {
@@ -234,6 +235,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   def get_scc12_values():
     # time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
     # desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
+    desired_gap = GAP_MAP_S.get(tuning.object_gap,40)
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
@@ -243,7 +245,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "ACCMode": 2 if enabled and long_override else 1 if enabled else 0,
       "StopReq": 1 if tuning.stopping else 0,
       # "ACC_ObjDist_Ref": int(desired_distance_m), #this is the cars desired distance
-      "ACC_ObjDist_Ref": lead_data.object_gap, # 5: >30, m, 4: 25-30 m, 3: 20-25 m, 2: < 20 m, 0: no lead
+      "ACC_ObjDist_Ref": desired_gap,
     }
 
   def get_scc14_values():
