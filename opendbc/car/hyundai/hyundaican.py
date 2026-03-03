@@ -224,6 +224,26 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   }
 
   def get_scc11_values():
+    aReq = tuning.desired_accel
+    abs_a = abs(aReq)
+
+    if aReq >= 0:
+      DecelMode = 0
+      AccelMode = 4
+    elif aReq == 0:
+      DecelMode = 0
+      AccelMode = 0
+    else:
+      if abs_a < 0.12:
+          DecelMode = 2
+      elif abs_a < 0.25:
+          DecelMode = 3
+      elif abs_a < 0.7:
+          DecelMode = 4
+      else:
+          DecelMode = 5
+      AccelMode = max(0, 4 - DecelMode)
+
     return {
       "aReqRaw": tuning.desired_accel,
       "aReqValue": tuning.actual_accel,
@@ -231,6 +251,8 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "JerkLowerLimit": tuning.jerk_lower,
       #"ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
       #"ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
+      "ACC_AccelMode": AccelMode,
+      "ACC_DecelMode": DecelMode,
     }
 
   def get_scc12_values():
