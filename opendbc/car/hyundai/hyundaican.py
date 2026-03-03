@@ -216,6 +216,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
 
   # STATIONARY_OFFSET_M = 4.0
   GAP_MAP_S = {
+    0: 0,
     2: 10,  # Close
     3: 30,  # Medium
     4: 40,  # Far
@@ -235,7 +236,7 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   def get_scc12_values():
     # time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
     # desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
-    desired_gap = GAP_MAP_S.get(tuning.object_gap,40)
+    desired_gap = GAP_MAP_S.get(lead_data.object_gap,50)
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
       "ACCMode_Inactive": 0 if enabled else 1,
