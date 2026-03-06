@@ -12,6 +12,8 @@ from opendbc.car.isotp_parallel_query import IsoTpParallelQuery
 DEVELOPER_DIAGNOSTIC = 0x07
 CUSTOM_DIAGNOSTIC_REQUEST = bytes([uds.SERVICE_TYPE.DIAGNOSTIC_SESSION_CONTROL, DEVELOPER_DIAGNOSTIC])
 CUSTOM_DIAGNOSTIC_RESPONSE = bytes([uds.SERVICE_TYPE.DIAGNOSTIC_SESSION_CONTROL + 0x40, DEVELOPER_DIAGNOSTIC])
+EXT_DIAG_REQUEST = b'\x10\x03'
+EXT_DIAG_RESPONSE = b'\x50\x03'
 
 READ_DATA_REQUEST = bytes([uds.SERVICE_TYPE.READ_DATA_BY_IDENTIFIER])
 READ_DATA_RESPONSE = bytes([uds.SERVICE_TYPE.READ_DATA_BY_IDENTIFIER + 0x40])
@@ -42,7 +44,7 @@ def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2
 
   for i in range(retry):
     try:
-      query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [CUSTOM_DIAGNOSTIC_REQUEST], [CUSTOM_DIAGNOSTIC_RESPONSE])
+      query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [EXT_DIAG_REQUEST], [EXT_DIAG_RESPONSE])
 
       for (rx_addr, _), data in query.get_data(timeout).items():
         carlog.error(f"Received response from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
