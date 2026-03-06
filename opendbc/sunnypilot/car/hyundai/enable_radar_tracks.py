@@ -24,21 +24,35 @@ DEFAULT_CONFIG = bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x00])
 TRACKS_ENABLED_CONFIG = bytes([0x00, 0x00, 0x00, 0x01, 0x00, 0x01])
 TRACKS_ENABLED_CONFIG_BYTES = b"\x00\x00\x01\x00\x01"
 
+RESET_REQUEST = b'\x11\x01'
+RESET_RESPONSE = b''
 
-def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2):
+
+def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2, reset=True):
   carlog.error("radar_tracks: enabling ...")
+
+  if reset:
+    try:
+      # Send reset first because the disable request below is not getting to the radar soon enough
+      carlog.error("sending reset (0x11 0x01) ...")
+      reset_query = IsoTpParallelQuery(can_send, can_recv, bus, [(addr, sub_addr)], [RESET_REQUEST], [RESET_RESPONSE])
+      reset_query.get_data(timeout=0.1)
+    except Exception:
+      carlog.error("reset failed or unsupported")
 
   for i in range(retry):
     try:
       query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [CUSTOM_DIAGNOSTIC_REQUEST], [CUSTOM_DIAGNOSTIC_RESPONSE])
 
-      for _, _ in query.get_data(timeout).items():
+      for (rx_addr, _), data in query.get_data(timeout).items():
+        carlog.error(f"Received response from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
         carlog.error("radar_tracks: check current config ...")
 
         request = READ_DATA_REQUEST + CONFIG_DATA_ID
         query = IsoTpParallelQuery(sendcan, logcan, bus, [addr], [request], [READ_DATA_RESPONSE])
 
-        for _, data in query.get_data(timeout).items():
+        for (rx_addr, _), data in query.get_data(timeout).items():
+          carlog.error(f"Received response from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
           current_config = data[3:]
 
           carlog.error(f"radar_tracks: current config: {current_config.hex()}")
@@ -66,8 +80,24 @@ def enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1, retry=2
 if __name__ == "__main__":
   import time
   import cereal.messaging as messaging
-  sendcan = messaging.pub_sock('sendcan')
-  logcan = messaging.sub_sock('can')
+
+  sendcan_sock = messaging.pub_sock('sendcan')
+  logcan_sock = messaging.sub_sock('can')
+
+  def sendcan(msgs):
+    m = messaging.new_message('sendcan', len(msgs))
+    for i, msg in enumerate(msgs):
+      m.sendcan[i].address = msg.address
+      m.sendcan[i].dat = msg.dat
+      m.sendcan[i].src = msg.src
+    sendcan_sock.send(m.to_bytes())
+
+  def logcan(*args, **kwargs):
+    msg = messaging.recv_sock(logcan_sock)
+    if msg is None:
+      return []
+    return msg.can
+
   time.sleep(1)
 
   enabled = enable_radar_tracks(logcan, sendcan, bus=0, addr=0x7d0, timeout=0.1)

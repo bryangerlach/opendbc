@@ -214,15 +214,6 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
   commands = []
   bus = CAN.ECAN
 
-  # STATIONARY_OFFSET_M = 4.0
-  GAP_MAP_S = {
-    0: 0,
-    2: 10,  # Close
-    3: 30,  # Medium
-    4: 40,  # Far
-    5: 50,
-  }
-
   def get_scc11_values():
     aReq = tuning.desired_accel
     abs_a = abs(aReq)
@@ -249,15 +240,19 @@ def create_acc_commands_can_canfd_blended(packer, enabled, accel, upper_jerk, id
       "aReqValue": tuning.actual_accel,
       "JerkUpperLimit": tuning.jerk_upper,
       "JerkLowerLimit": tuning.jerk_lower,
-      #"ComfortBandUpper": tuning.comfort_band_upper, # stock usually is 0 but sometimes uses higher values
-      #"ComfortBandLower": tuning.comfort_band_lower, # stock usually is 0 but sometimes uses higher values
       "ACC_AccelMode": AccelMode,
       "ACC_DecelMode": DecelMode,
     }
 
   def get_scc12_values():
-    # time_gap_s = GAP_MAP_S.get(hud_control.leadDistanceBars, 1.9)
-    # desired_distance_m = (v_ego * time_gap_s) + STATIONARY_OFFSET_M
+    # STATIONARY_OFFSET_M = 4.0
+    GAP_MAP_S = {
+      0: 0,
+      2: 10,
+      3: 30,
+      4: 40,
+      5: 50,
+    }
     desired_gap = GAP_MAP_S.get(lead_data.object_gap,50)
     return {
       "MainMode_ACC": 1 if main_cruise_enabled else 0,
