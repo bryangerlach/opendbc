@@ -56,8 +56,8 @@ class CarControllerParams:
       self.STEER_MAX = 360 #original 384, car maxes out around 425 it seems
       self.STEER_DRIVER_ALLOWANCE = 50  # CAN driver torque signal scaling
       self.STEER_THRESHOLD = 250
-      self.STEER_DELTA_UP = 2   # CAN FD rate limits
-      self.STEER_DELTA_DOWN = 3  # CAN FD rate limits
+      self.STEER_DELTA_UP = 3   # CAN FD rate limits
+      self.STEER_DELTA_DOWN = 7  # CAN FD rate limits
 
     # Default for most HKG
     else:
