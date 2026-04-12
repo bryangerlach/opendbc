@@ -55,11 +55,11 @@ class CarControllerParams:
 
     elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
       params = Params()
-      custom_steer_max = params.get_int("CustomSteerMax") or 400
-      custom_allowance = params.get_int("CustomAllowance") or 50
-      custom_threshold = params.get_int("CustomThreshold") or 150
-      custom_delta_up = params.get_int("CustomDeltaUp") or 2
-      custom_delta_down = params.get_int("CustomDeltaDown") or 3
+      custom_steer_max = int(params.get("CustomSteerMax")) or 400
+      custom_allowance = int(params.get("CustomAllowance")) or 50
+      custom_threshold = int(params.get("CustomThreshold")) or 150
+      custom_delta_up = int(params.get("CustomDeltaUp")) or 2
+      custom_delta_down = int(params.get("CustomDeltaDown")) or 3
 
       self.STEER_MAX = min(custom_steer_max, 400) #original 384, car maxes out around 425 it seems
       self.STEER_DRIVER_ALLOWANCE = min(custom_allowance, 250)  # CAN driver torque signal scaling
