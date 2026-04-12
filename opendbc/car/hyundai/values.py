@@ -9,6 +9,7 @@ from opendbc.car.docs_definitions import CarHarness, CarDocs, CarParts, SupportT
 from opendbc.car.fw_query_definitions import FwQueryConfig, Request, p16
 
 from opendbc.sunnypilot.car.hyundai.values import HyundaiFlagsSP
+from openpilot.common.params import Params
 
 Ecu = CarParams.Ecu
 
@@ -53,11 +54,18 @@ class CarControllerParams:
       self.STEER_DELTA_DOWN = 3
 
     elif CP.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-      self.STEER_MAX = 400 #original 384, car maxes out around 425 it seems
-      self.STEER_DRIVER_ALLOWANCE = 50  # CAN driver torque signal scaling
-      self.STEER_THRESHOLD = 150
-      self.STEER_DELTA_UP = 2   # CAN FD rate limits
-      self.STEER_DELTA_DOWN = 3  # CAN FD rate limits
+      params = Params()
+      custom_steer_max = params.get_int("CustomSteerMax") or 400
+      custom_allowance = params.get_int("CustomAllowance") or 50
+      custom_threshold = params.get_int("CustomThreshold") or 150
+      custom_delta_up = params.get_int("CustomDeltaUp") or 2
+      custom_delta_down = params.get_int("CustomDeltaDown") or 3
+
+      self.STEER_MAX = min(custom_steer_max, 400) #original 384, car maxes out around 425 it seems
+      self.STEER_DRIVER_ALLOWANCE = min(custom_allowance, 250)  # CAN driver torque signal scaling
+      self.STEER_THRESHOLD = min(custom_threshold, 250)
+      self.STEER_DELTA_UP = min(custom_delta_up, 4)   # CAN FD rate limits
+      self.STEER_DELTA_DOWN = min(custom_delta_down, 7)  # CAN FD rate limits
 
     # Default for most HKG
     else:
