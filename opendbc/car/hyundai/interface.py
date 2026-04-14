@@ -11,6 +11,7 @@ from opendbc.car.hyundai.radar_interface import RadarInterface
 from opendbc.sunnypilot.car.hyundai.escc import ESCC_MSG
 from opendbc.sunnypilot.car.hyundai.longitudinal.helpers import get_longitudinal_tune
 from opendbc.sunnypilot.car.hyundai.values import HyundaiFlagsSP, HyundaiSafetyFlagsSP
+from openpilot.common.params import Params
 
 ButtonType = structs.CarState.ButtonEvent.Type
 Ecu = structs.CarParams.Ecu
@@ -143,8 +144,9 @@ class CarInterface(CarInterfaceBase):
     ret.startAccel = 1.0
     ret.longitudinalActuatorDelay = 0.5
 
-    # if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
-    #   ret.stoppingDecelRate = 0.4
+    if ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
+      params = Params()
+      ret.stoppingDecelRate = float(params.get("CustomStoppingDecelrate")) or 0.4
 
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.LONG.value
