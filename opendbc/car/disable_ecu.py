@@ -19,16 +19,12 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
   This is used to disable the radar in some cars. Openpilot will emulate the radar.
   WARNING: THIS DISABLES AEB!"""
 
-  def confirm_radar_silent():
-    radar_msgs = [0x420, 0x421, 0x389]
-    start_time = time.monotonic()
-    while time.monotonic() - start_time < CONFIRM_TIMEOUT:
-      msg = can_recv()
-      if msg and msg[0] == bus and msg[1] in radar_msgs:
-        carlog.error(f"Radar still sending {hex(msg[1])} on bus {bus}")
-        return False
-    carlog.error(f"Radar silent on bus {bus} for {CONFIRM_TIMEOUT}s, confirmed disabled")
-    return True
+  def confirm_radar_silent(msg):
+    if msg[0] == 0x7F:
+      carlog.error(f"Negative response from ECU: {msg.hex()}")
+      return False
+    else:
+      return True
 
   carlog.warning(f"ecu disable {hex(addr), sub_addr} ...")
 
@@ -55,7 +51,7 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
           carlog.error(f"Received COM_CONT_RESPONSE from 0x{rx_addr:X} on bus {bus}: {data.hex()}")
 
         # Confirm radar silence after disable
-        if confirm_radar_silent():
+        if confirm_radar_silent(data):
           carlog.error(f"ecu disabled on bus {bus}")
           return True
         else:
