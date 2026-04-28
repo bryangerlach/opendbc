@@ -20,11 +20,15 @@ def disable_ecu(can_recv, can_send, bus=0, addr=0x7d0, sub_addr=None, com_cont_r
   WARNING: THIS DISABLES AEB!"""
 
   def confirm_radar_silent(msg):
-    if msg[0] == 0x7F:
-      carlog.error(f"Negative response from ECU: {msg.hex()}")
-      return False
-    else:
-      return True
+    try:
+      if msg[0] == 0x7F:
+        carlog.error(f"Negative response from ECU: {msg.hex()}")
+        return False
+      else:
+        carlog.error(f"Response from ECU: {msg.hex()}")
+    except Exception:
+      carlog.error("error confirming disable")
+    return True
 
   carlog.warning(f"ecu disable {hex(addr), sub_addr} ...")
 
