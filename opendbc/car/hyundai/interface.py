@@ -182,7 +182,8 @@ class CarInterface(CarInterfaceBase):
     lka_steering = 0x50 in fingerprint[cam_can] or 0x110 in fingerprint[cam_can]
     CAN = CanBus(None, fingerprint, lka_steering)
 
-    if not stock_cp.flags & HyundaiFlags.CANFD:
+    #if not stock_cp.flags & HyundaiFlags.CANFD:
+    if False:
       # TODO-SP: add route with ESCC message for process replay
       if ESCC_MSG in fingerprint[0]:
         ret.flags |= HyundaiFlagsSP.ENHANCED_SCC.value
