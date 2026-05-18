@@ -250,7 +250,7 @@ static bool hyundai_tx_hook(const CANPacket_t *msg) {
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS = HYUNDAI_LIMITS(384, 3, 7, 50);
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT = HYUNDAI_LIMITS(270, 2, 3, 50);
   const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_ALT_2 = HYUNDAI_LIMITS(170, 2, 3, 50);
-  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED = HYUNDAI_LIMITS(384, 2, 3, 250);
+  const TorqueSteeringLimits HYUNDAI_STEERING_LIMITS_CAN_CANFD_BLENDED = HYUNDAI_LIMITS(405, 4, 7, 250);
 
   bool tx = true;
 

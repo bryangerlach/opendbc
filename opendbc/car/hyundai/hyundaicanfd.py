@@ -40,7 +40,8 @@ class CanBus(CanBusBase):
 
 def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
                             frame, torque_fault, left_lane, right_lane,
-                            left_lane_depart, right_lane_depart, lkas_icon, vEgo):
+                            left_lane_depart, right_lane_depart, lkas_icon, vEgo,
+                            low_speed_damp, low_speed_ms, high_speed_damp):
   common_values = {
     "LKA_MODE": 2,
     "LKA_ICON": lkas_icon,
@@ -48,7 +49,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_torque,
     "LKA_ASSIST": 0,
     "STEER_REQ": 1 if lat_active else 0,
     "HAS_LANE_SAFETY": 0,  # hide LKAS settings
-    "DAMP_FACTOR": 50 if vEgo < 17.8816 else 80,  # can potentially tuned for better perf [3, 200]
+    "DAMP_FACTOR": low_speed_damp if vEgo < low_speed_ms else high_speed_damp,  # can potentially tuned for better perf [3, 200]
   }
 
   lkas_values = copy.copy(common_values)

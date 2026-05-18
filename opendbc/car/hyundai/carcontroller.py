@@ -14,6 +14,8 @@ from opendbc.sunnypilot.car.hyundai.longitudinal.controller import LongitudinalC
 from opendbc.sunnypilot.car.hyundai.lead_data_ext import LeadDataCarController
 from opendbc.sunnypilot.car.hyundai.mads import MadsCarController
 
+from openpilot.common.params import Params
+
 VisualAlert = structs.CarControl.HUDControl.VisualAlert
 LongCtrlState = structs.CarControl.Actuators.LongControlState
 
@@ -66,6 +68,11 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     self.apply_torque_last = 0
     self.car_fingerprint = CP.carFingerprint
     self.last_button_frame = 0
+
+    custom_params = Params()
+    self.low_speed_damp = custom_params.get_int("CustomLowDamp") or 100
+    self.low_speed_ms = custom_params.get_float("CustomLowSpeedMS") or 17.8
+    self.high_speed_damp = custom_params.get_int("CustomHighDamp") or 100
 
   def update(self, CC, CC_SP, CS, now_nanos):
     EsccCarController.update(self, CS)
@@ -200,7 +207,8 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, apply_steer_req, apply_torque,
                                                            self.frame, torque_fault,
                                                            hud_control.leftLaneVisible, hud_control.rightLaneVisible,
-                                                           left_lane_warning, right_lane_warning, self.lkas_icon, CS.out.vEgo))
+                                                           left_lane_warning, right_lane_warning, self.lkas_icon, CS.out.vEgo,
+                                                           self.low_speed_damp, self.low_speed_ms, self.high_speed_damp))
 
 
     # prevent LFA from activating on LKA steering cars by sending "no lane lines detected" to ADAS ECU
