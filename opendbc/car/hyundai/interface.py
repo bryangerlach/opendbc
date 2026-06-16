@@ -116,7 +116,7 @@ class CarInterface(CarInterfaceBase):
         ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAN_CANFD_BLENDED.value
 
       if lka_steering:
-        ret.flags |= HyundaiFlags.CANFD_LKA_STEERING.value
+        ret.flags |= HyundaiFlags.CANFD_LKA_STEER_MSG.value
 
       # These cars have the LFA button on the steering wheel
       if 0x391 in fingerprint[0] or ret.flags & HyundaiFlags.CAN_CANFD_BLENDED:
@@ -248,7 +248,7 @@ class CarInterface(CarInterfaceBase):
     if CP.openpilotLongitudinalControl and not ((CP.flags & (HyundaiFlags.CANFD_CAMERA_SCC | HyundaiFlags.CAMERA_SCC)) or
                                                 (CP_SP.flags & HyundaiFlagsSP.ENHANCED_SCC)):
       addr, bus = 0x7d0, CanBus(CP).ECAN if CP.flags & HyundaiFlags.CAN_CANFD_BLENDED else 0
-      if CP.flags & HyundaiFlags.CANFD_LKA_STEERING.value:
+      if CP.flags & HyundaiFlags.CANFD_LKA_STEER_MSG.value:
         addr, bus = 0x730, CanBus(CP).ECAN
       disable_ecu(can_recv, can_send, bus=bus, addr=addr, com_cont_req=communication_control)
 
