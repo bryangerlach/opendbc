@@ -656,23 +656,31 @@
     ],
     "package": "Co-Pilot360 Assist 2.0"
   },
-  "Ford Focus 2018": {
+  "Ford Focus 2018-22": {
     "platform": "FORD_FOCUS_MK4",
     "make": "Ford",
     "brand": "ford",
     "model": "Focus",
     "year": [
-      "2018"
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022"
     ],
     "package": "Adaptive Cruise Control with Lane Centering"
   },
-  "Ford Focus Hybrid 2018": {
+  "Ford Focus Hybrid 2018-22": {
     "platform": "FORD_FOCUS_MK4",
     "make": "Ford",
     "brand": "ford",
     "model": "Focus Hybrid",
     "year": [
-      "2018"
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022"
     ],
     "package": "Adaptive Cruise Control with Lane Centering"
   },
@@ -1647,6 +1655,17 @@
     ],
     "package": "Highway Driving Assist II"
   },
+  "Hyundai Ioniq 6 (without HDA II) 2023-24": {
+    "platform": "HYUNDAI_IONIQ_6",
+    "make": "Hyundai",
+    "brand": "hyundai",
+    "model": "Ioniq 6 (without HDA II)",
+    "year": [
+      "2023",
+      "2024"
+    ],
+    "package": "Highway Driving Assist"
+  },
   "Hyundai Ioniq 9 (with HDA II & LFA2) 2025-26": {
     "platform": "HYUNDAI_IONIQ_9",
     "make": "Hyundai",
@@ -2453,12 +2472,14 @@
     ],
     "package": "All"
   },
-  "Kia Sorento Hybrid 2026 with LFA2": {
+  "Kia Sorento Hybrid 2026": {
     "platform": "KIA_SORENTO_HEV_4TH_GEN_LFA2",
     "make": "Kia",
     "brand": "hyundai",
-    "model": "Sorento Hybrid 2026 with LFA2",
-    "year": [],
+    "model": "Sorento Hybrid",
+    "year": [
+      "2026"
+    ],
     "package": "All"
   },
   "Kia Sorento Plug-in Hybrid 2022-23": {
@@ -2891,7 +2912,7 @@
     ],
     "package": "All"
   },
-  "Nissan Altima 2019-20, 2024": {
+  "Nissan Altima 2019-24": {
     "platform": "NISSAN_ALTIMA",
     "make": "Nissan",
     "brand": "nissan",
@@ -2899,6 +2920,9 @@
     "year": [
       "2019",
       "2020",
+      "2021",
+      "2022",
+      "2023",
       "2024"
     ],
     "package": "ProPILOT Assist"
