@@ -87,6 +87,9 @@ class CarInterface(CarInterfaceBase):
         ret.safetyConfigs[-1].safetyParam |= HyundaiSafetyFlags.CAMERA_SCC.value
 
     else:
+      cam_can = CanBus(None, fingerprint).CAM
+      lka_steering = 0x50 in fingerprint[cam_can] or 0x110 in fingerprint[cam_can]
+      CAN = CanBus(None, fingerprint, lka_steering)
       # Shared configuration for non CAN-FD cars
       ret.alphaLongitudinalAvailable = not (ret.flags & (HyundaiFlags.LEGACY | HyundaiFlags.UNSUPPORTED_LONGITUDINAL))
       ret.enableBsm = 0x58b in fingerprint[CAN.ECAN]
