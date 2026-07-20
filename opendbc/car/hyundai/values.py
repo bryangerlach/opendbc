@@ -15,8 +15,8 @@ Ecu = CarParams.Ecu
 
 
 class CarControllerParams:
-  ACCEL_MIN = -3.5 # m/s
-  ACCEL_MAX = 2.0 # m/s
+  ACCEL_MIN = -3.5 # m/s^2
+  ACCEL_MAX = 2.0 # m/s^2
 
   ANGLE_LIMITS: AngleSteeringLimitsVM = AngleSteeringLimitsVM(
     # Steering angle limits based on observed stock ADAS behavior:
@@ -231,6 +231,13 @@ class CAR(Platforms):
     CarSpecs(mass=1675, wheelbase=2.885, steerRatio=14.5),
     flags=HyundaiFlags.HYBRID,
   )
+  HYUNDAI_AZERA_HEV_7TH_GEN = HyundaiCanFDPlatformConfig(
+    [
+      HyundaiCarDocs("Hyundai AZERA Hybrid (with HDA II & LFA2) 2025", "Highway Driving Assist II & Lane Follow Assist 2", car_parts=CarParts.common([CarHarness.hyundai_s])),
+    ],
+    CarSpecs(mass=1720, wheelbase=2.895, steerRatio=13.5),
+    flags=HyundaiFlags.CANFD_ANGLE_STEERING,
+  ) 
   HYUNDAI_ELANTRA = HyundaiPlatformConfig(
     [
       # TODO: 2017-18 could be Hyundai G
@@ -871,6 +878,7 @@ PART_NUMBER_FW_PATTERN = re.compile(b'(?<=[0-9][.,][0-9]{2} )([0-9]{5}[-/]?[A-Z]
 
 # We've seen both ICE and hybrid for these platforms, and they have hybrid descriptors (e.g. MQ4 vs MQ4H)
 CANFD_FUZZY_WHITELIST = {CAR.KIA_SORENTO_4TH_GEN, CAR.KIA_SORENTO_HEV_4TH_GEN, CAR.KIA_K8_HEV_1ST_GEN,
+                         CAR.KIA_SPORTAGE_5TH_GEN,
                          # TODO: the hybrid variant is not out yet
                          CAR.KIA_CARNIVAL_4TH_GEN, CAR.KIA_SORENTO_HEV_4TH_GEN_LFA2}
 
