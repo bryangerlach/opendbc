@@ -44,12 +44,12 @@ def get_baseline_safety_cp():
 def compute_torque_reduction_gain(steering_torque, v_ego, lat_active, last_gain):
   if lat_active:
     ceiling = np.interp(v_ego, [0.5, 1.5], [1.0, 0.85])
-    shelf = np.interp(v_ego, [2, 11], [0.45, 0.6])
-    floor = np.interp(v_ego, [2, 22], [0.1, 0.3])
-    bp1 = np.interp(v_ego, [2, 11], [50, 90])     # was [75, 125]
-    bp2 = np.interp(v_ego, [2, 11], [100, 140])   # was [125, 150]
-    bp3 = np.interp(v_ego, [2, 11], [125, 200])   # was [175, 275]
-    bp4 = np.interp(v_ego, [2, 22], [300, 500])   # was [400, 700]
+    shelf = np.interp(v_ego, [2, 11], [0.5, 0.65])
+    floor = np.interp(v_ego, [2, 22], [0.25, 0.4])   # was [0.1, 0.3] - never fully snaps to zero
+    bp1 = np.interp(v_ego, [2, 11], [25, 50])        # was [50, 90]  - start reducing sooner
+    bp2 = np.interp(v_ego, [2, 11], [60, 100])       # was [100, 140]
+    bp3 = np.interp(v_ego, [2, 11], [90, 150])       # was [125, 200]
+    bp4 = np.interp(v_ego, [2, 22], [150, 300])      # was [300, 500] - never fully snaps off
     target = np.interp(abs(steering_torque), [bp1, bp2, bp3, bp4], [ceiling, shelf, shelf, floor])
 
   else:
