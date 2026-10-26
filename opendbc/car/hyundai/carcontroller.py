@@ -44,12 +44,12 @@ def get_baseline_safety_cp():
 def compute_torque_reduction_gain(steering_torque, v_ego, lat_active, last_gain):
   if lat_active:
     ceiling = np.interp(v_ego, [0.5, 1.5], [1.0, 0.85])
-    shelf = np.interp(v_ego, [2, 11], [0.5, 0.65])
-    floor = np.interp(v_ego, [2, 22], [0.25, 0.4])   # was [0.1, 0.3] - never fully snaps to zero
-    bp1 = np.interp(v_ego, [2, 11], [25, 50])        # was [50, 90]  - start reducing sooner
-    bp2 = np.interp(v_ego, [2, 11], [60, 100])       # was [100, 140]
-    bp3 = np.interp(v_ego, [2, 11], [90, 150])       # was [125, 200]
-    bp4 = np.interp(v_ego, [2, 22], [150, 300])      # was [300, 500] - never fully snaps off
+    shelf = np.interp(v_ego, [2, 11], [0.45, 0.6])
+    floor = np.interp(v_ego, [2, 22], [0.1, 0.3])
+    bp1 = np.interp(v_ego, [2, 11], [50, 90])
+    bp2 = np.interp(v_ego, [2, 11], [100, 140])
+    bp3 = np.interp(v_ego, [2, 11], [125, 200])
+    bp4 = np.interp(v_ego, [2, 22], [300, 500])
     target = np.interp(abs(steering_torque), [bp1, bp2, bp3, bp4], [ceiling, shelf, shelf, floor])
 
   else:
@@ -152,6 +152,12 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       desired_angle = self.angle_filter.update(desired_angle)
 
       apply_angle = apply_steer_angle_limits_vm(desired_angle, self.apply_angle_last, v_ego_raw, CS.out.steeringAngleDeg, CC.latActive, self.params, self.VM)
+
+      # Back off commanded angle toward actual steering angle when driver applies manual torque,
+      # so the EPS does not fight the driver on angle-steering cars (e.g. EV9).
+      if apply_angle is not None and CC.latActive and abs(CS.out.steeringTorque) > self.params.STEER_THRESHOLD:
+        backoff = float(np.clip((abs(CS.out.steeringTorque) - self.params.STEER_THRESHOLD) / 300.0, 0.0, 1.0))
+        apply_angle = apply_angle * (1.0 - backoff) + CS.out.steeringAngleDeg * backoff
 
       # if we are not the baseline model, we use the baseline model for further limits to prevent a panda block since it is hardcoded for baseline model.
       # if self.CP.carFingerprint != ANGLE_SAFETY_BASELINE_MODEL:
