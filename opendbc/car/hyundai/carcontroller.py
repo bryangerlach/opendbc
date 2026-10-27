@@ -156,7 +156,7 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       # Back off commanded angle toward actual steering angle when driver applies manual torque,
       # so the EPS does not fight the driver on angle-steering cars (e.g. EV9).
       if apply_angle is not None and CC.latActive and abs(CS.out.steeringTorque) > self.params.STEER_THRESHOLD:
-        backoff = float(np.clip((abs(CS.out.steeringTorque) - self.params.STEER_THRESHOLD) / 300.0, 0.0, 1.0))
+        backoff = float(np.clip((abs(CS.out.steeringTorque) - self.params.STEER_THRESHOLD) / 150.0, 0.0, 1.0))
         apply_angle = apply_angle * (1.0 - backoff) + CS.out.steeringAngleDeg * backoff
 
       # if we are not the baseline model, we use the baseline model for further limits to prevent a panda block since it is hardcoded for baseline model.
