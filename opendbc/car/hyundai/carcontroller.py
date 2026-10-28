@@ -46,10 +46,10 @@ def compute_torque_reduction_gain(steering_torque, v_ego, lat_active, last_gain)
     ceiling = np.interp(v_ego, [0.5, 1.5], [1.0, 0.85])
     shelf = np.interp(v_ego, [2, 11], [0.45, 0.6])
     floor = np.interp(v_ego, [2, 22], [0.1, 0.3])
-    bp1 = np.interp(v_ego, [2, 11], [50, 90])
-    bp2 = np.interp(v_ego, [2, 11], [100, 140])
-    bp3 = np.interp(v_ego, [2, 11], [125, 200])
-    bp4 = np.interp(v_ego, [2, 22], [300, 500])
+    bp1 = np.interp(v_ego, [2, 11], [75, 125])
+    bp2 = np.interp(v_ego, [2, 11], [125, 150])
+    bp3 = np.interp(v_ego, [2, 11], [175, 275])
+    bp4 = np.interp(v_ego, [2, 22], [400, 700])
     target = np.interp(abs(steering_torque), [bp1, bp2, bp3, bp4], [ceiling, shelf, shelf, floor])
 
   else:
@@ -116,7 +116,6 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
     self.VM = VehicleModel(CP)
     self.BASELINE_VM = VehicleModel(get_baseline_safety_cp())
     self.apply_angle_last = 0
-    self.backoff = 0.0
 
     self.accel_last = 0
     self.apply_torque_last = 0
@@ -153,18 +152,6 @@ class CarController(CarControllerBase, EsccCarController, LeadDataCarController,
       desired_angle = self.angle_filter.update(desired_angle)
 
       apply_angle = apply_steer_angle_limits_vm(desired_angle, self.apply_angle_last, v_ego_raw, CS.out.steeringAngleDeg, CC.latActive, self.params, self.VM)
-
-      # Back off commanded angle toward actual steering angle when driver applies manual torque,
-      # so the EPS does not fight the driver on angle-steering cars (e.g. EV9).
-      raw_backoff = 0.0
-      if apply_angle is not None and CC.latActive and abs(CS.out.steeringTorque) > self.params.STEER_THRESHOLD:
-        raw_backoff = float(np.clip((abs(CS.out.steeringTorque) - self.params.STEER_THRESHOLD) / 150.0, 0.0, 1.0))
-
-      # Smooth backoff to prevent steering wheel wobble from frame-to-frame jitter
-      self.backoff = self.backoff + 0.1 * (raw_backoff - self.backoff)
-
-      if apply_angle is not None and self.backoff > 0.01:
-        apply_angle = apply_angle * (1.0 - self.backoff) + CS.out.steeringAngleDeg * self.backoff
 
       # if we are not the baseline model, we use the baseline model for further limits to prevent a panda block since it is hardcoded for baseline model.
       # if self.CP.carFingerprint != ANGLE_SAFETY_BASELINE_MODEL:
